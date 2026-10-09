@@ -12,7 +12,7 @@
 <div class="card"><h2>獎賞領取記錄</h2><div class="scroll"><table><thead><tr><th>日期</th><th>備註</th><th></th></tr></thead><tbody id="claimRows"></tbody></table></div></div><button id="logout" class="alt">登出</button></div>
 <div id="msg" class="msg"></div><p class="muted">本工具只供個人記錄，並非官方 APP；不會自動判斷商戶資格、連接電子錢包或代領獎賞。請自行核對官方規則。</p></main>
 <script>
-const $=id=>document.getElementById(id);let db,user,wallets=[],txs=[],claims=[],selected=null;const today=()=>new Date().toLocaleDateString('en-CA');$('date').value=today();$('claimDate').value=today();$('url').value=localStorage.getItem('mr-url')||'';$('key').value=localStorage.getItem('mr-key')||'';
+const $=id=>document.getElementById(id);let db,user,wallets=[],txs=[],claims=[],selected=null;const today=()=>new Date().toLocaleDateString('en-CA');$('date').value=today();$('claimDate').value=today();$('url').value=localStorage.getItem('mr-url')||'https://wokoioenlqtsmhyobxko.supabase.co';$('key').value=localStorage.getItem('mr-key')||'sb_publishable_Ds1oRszcoozkgZju6o1L9w_HP60YnpO';
 function msg(s,err=false,el='msg'){$(el).textContent=s;$(el).className='msg'+(err?' error':'')}function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}function cash(n){return 'MOP '+Number(n||0).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}
 function connect(){const url=$('url').value.trim(),key=$('key').value.trim();if(!url||!key)throw Error('請輸入 URL 和 Publishable key');localStorage.setItem('mr-url',url);localStorage.setItem('mr-key',key);db=supabase.createClient(url,key)}
 function view(){ $('setup').classList.add('hidden');$('auth').classList.toggle('hidden',!!user);$('app').classList.toggle('hidden',!user)}
