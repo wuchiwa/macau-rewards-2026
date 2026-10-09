@@ -6,6 +6,7 @@ create table if not exists public.wallets (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,
   name text not null check (char_length(trim(name)) between 1 and 60),
+  owner_name text not null default '自己',
   created_at timestamptz not null default now(),
   unique (user_id, name)
 );
@@ -25,6 +26,9 @@ create table if not exists public.reward_claims (
   user_id uuid not null references auth.users(id) on delete cascade,
   wallet_id uuid not null references public.wallets(id) on delete cascade,
   claimed_on date not null default current_date,
+  result_type text not null default 'thanks' check (result_type in ('thanks','coupon')),
+  coupon_value integer check ((result_type = 'thanks' and coupon_value is null) or (result_type = 'coupon' and coupon_value in (10,20,50,100,200))),
+  redeemed boolean not null default false,
   note text not null default '' check (char_length(note) <= 200),
   created_at timestamptz not null default now()
 );
