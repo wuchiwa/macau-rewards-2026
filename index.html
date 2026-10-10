@@ -2,6 +2,67 @@
 <html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#102b46"><title>連環賞小管家｜澳門消費連環賞 2026</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--navy:#102b46;--blue:#2867d8;--mint:#d9f6e8;--paper:#f4f7fb;--ink:#1d2e42;--muted:#6b7d90;--line:#e3eaf2;--gold:#ffefc2}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}header{background:linear-gradient(120deg,#102b46,#1d4b73);color:white;padding:24px max(18px,calc((100% - 1100px)/2)) 28px}.top{display:flex;justify-content:space-between;gap:16px;align-items:center}.brand{font-size:12px;letter-spacing:.14em;color:#b7d8f8;font-weight:800}.hero{font-size:clamp(24px,4vw,34px);font-weight:850;letter-spacing:-.04em;margin:8px 0}.sub{color:#d3e3f4;font-size:13px;line-height:1.6}main{max-width:1100px;margin:22px auto;padding:0 16px 36px}.card{background:white;border:1px solid var(--line);border-radius:20px;padding:20px;margin-bottom:16px;box-shadow:0 5px 20px #193a5707}.card h2{font-size:17px;margin:0 0 14px}.muted{color:var(--muted);font-size:12px;line-height:1.65}.hidden{display:none!important}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.stat{padding:17px;border-radius:17px;background:white;border:1px solid var(--line)}.stat .label{font-size:12px;color:var(--muted)}.stat .value{font-size:25px;font-weight:850;letter-spacing:-.04em;margin:7px 0 3px}.stat .hint{font-size:11px;color:var(--muted)}.wallet-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.wallet{position:relative;text-align:left;background:white;color:var(--ink);border:1px solid var(--line);padding:13px;border-radius:16px;min-height:95px;display:flex;flex-direction:column;gap:7px;transition:.15s}.wallet:hover{border-color:#9bbdf5;transform:translateY(-1px)}.wallet.active{border:2px solid var(--blue);background:#f1f6ff;padding:12px}.wallet .emoji{width:36px;height:36px;object-fit:contain;border-radius:9px;background:#fff}.wallet .platform-logo{display:block;width:36px;height:36px;object-fit:contain}.wallet .wname{font-size:13px;font-weight:800;overflow-wrap:anywhere}.wallet .owner{font-size:10px;color:var(--muted)}.wallet .amount{font-size:11px;font-weight:700;color:#1e805a}.wallet.active:after{content:'✓';position:absolute;right:9px;top:8px;color:var(--blue);font-weight:900}.platform-picker{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;width:100%}.platform-choice{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:66px;padding:7px 5px;background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:12px;font-size:11px}.platform-choice img{width:25px;height:25px;object-fit:contain}.platform-choice.active{border:2px solid var(--blue);background:#f1f6ff;padding:6px 4px}.result-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:6px}.result-choice{min-height:76px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:9px 4px;background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:13px;font-size:12px;line-height:1.3}.result-choice .result-emoji{font-size:21px}.result-choice.active{border:2px solid var(--blue);background:#f1f6ff;padding:8px 3px}.result-choice.active[data-value="merchant_discount"]{border-color:#e6b84d;background:#fff3c4}.result-choice.active[data-value="consumer_benefit"]{border-color:#75a9f7;background:#eaf3ff}.result-choice.active[data-value="10"],.result-choice.active[data-value="20"],.result-choice.active[data-value="50"],.result-choice.active[data-value="100"],.result-choice.active[data-value="200"]{border-color:#e6b84d;background:#fff8e7}.draw-select-hidden{display:none!important}@media(max-width:700px){.platform-picker{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.platform-choice{min-height:60px;font-size:10px}.platform-choice img{width:23px;height:23px}.result-options{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.result-choice{min-height:72px;font-size:11px;padding:7px 2px}}.row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.section-tag{font-size:11px;font-weight:800;letter-spacing:.07em;color:var(--blue);text-transform:uppercase}.inputrow{display:flex;gap:8px;flex-wrap:wrap}input,select{font:inherit;padding:12px 13px;border:1px solid #d8e1eb;border-radius:11px;background:white;min-width:0}input:focus,select:focus{outline:3px solid #dce9ff;border-color:#83aaf0}button{font:inherit;cursor:pointer;border:0;border-radius:11px;padding:11px 15px;background:var(--blue);color:white;font-weight:800;transition:.15s}button:hover{filter:brightness(.97)}button:disabled{opacity:.4;cursor:not-allowed}.soft{background:#edf3fa;color:#2e4a65}.tiny{font-size:11px;padding:7px 10px}.danger{background:#fff0ef;color:#b42318}.outcomes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.draw-grid{display:grid;grid-template-columns:1fr;gap:12px}.draw-grid label{display:block}.outcome{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:16px;padding:17px 10px;min-height:104px}.outcome .big{font-size:23px;font-weight:900;display:block;margin-bottom:5px}.outcome .small{font-size:11px;color:var(--muted)}.outcome.coupon{background:#fff9e9;border-color:#f2e2b8}.outcome.coupon .big{color:#9a6400}.outcome:disabled{filter:grayscale(.4)}.progress{height:8px;background:#edf1f5;border-radius:20px;overflow:hidden;margin:10px 0}.progress span{display:block;height:100%;background:linear-gradient(90deg,#40c48b,#1c9c6c);border-radius:20px}.loglist{display:flex;flex-direction:column;gap:9px}.week-summary{display:grid;grid-template-columns:1fr auto;gap:6px 12px;padding:12px;border:1px solid var(--line);border-radius:13px}.week-summary .week-title{font-size:12px;font-weight:850}.week-summary .week-detail{font-size:11px;color:var(--muted);line-height:1.6}.pill.expired{background:#fee2e2;color:#991b1b}.log{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--line);border-radius:14px}.logicon{width:42px;height:42px;border-radius:13px;background:#fff2cf;display:grid;place-items:center;font-size:19px;flex-shrink:0}.logmain{flex:1;min-width:0}.logtitle{font-size:13px;font-weight:850}.logsub{font-size:11px;color:var(--muted);margin-top:3px}.pill{display:inline-block;border-radius:999px;background:#edf3fa;color:#45617b;padding:4px 8px;font-size:10px;font-weight:800}.pill.green{background:#dff7eb;color:#14744d}.pill.gold{background:#fff0c8;color:#885900}.empty{padding:24px;text-align:center;color:var(--muted);font-size:13px}.cols{display:grid;grid-template-columns:1.05fr .95fr;gap:16px}.msg{font-size:12px;line-height:1.6;margin-top:10px;color:#17744f}.msg.error{color:#b42318}.note{background:#f7f9fc;border-radius:12px;padding:12px;font-size:11px;color:var(--muted);line-height:1.7}.rulegrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.rule{background:#f7f9fc;border-radius:13px;padding:12px}.rule b{display:block;font-size:13px;margin-bottom:4px}.rule span{font-size:11px;color:var(--muted);line-height:1.5}.divider{height:1px;background:var(--line);margin:16px 0}.authwrap{max-width:520px;margin:22px auto}.foot{text-align:center;color:var(--muted);font-size:11px;padding:12px}@media(max-width:700px){header{padding:20px 17px 24px}.top{align-items:flex-start}.grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.stat{padding:12px}.stat .value{font-size:20px}.wallet-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.cols{grid-template-columns:1fr}.outcomes{grid-template-columns:repeat(2,minmax(0,1fr))}.outcome:first-child{grid-column:span 2}.card{padding:16px;border-radius:17px}.rulegrid{grid-template-columns:1fr}.hero{font-size:25px}}
+
+/* Compact mobile layout: preserve desktop spacing and all existing behavior */
+@media(max-width:700px){
+  header{padding:14px 13px 16px}
+  .brand{font-size:10px;letter-spacing:.12em}
+  .hero{font-size:22px;margin:5px 0}
+  .sub{font-size:12px;line-height:1.45}
+  main{margin:12px auto;padding:0 10px 22px}
+  .card{padding:12px;margin-bottom:10px;border-radius:15px}
+  .card h2{font-size:15px;margin-bottom:9px}
+  .muted{font-size:11px;line-height:1.5}
+  .grid{gap:5px;margin-bottom:10px}
+  .stat{padding:9px;border-radius:12px}
+  .stat .label{font-size:10px;line-height:1.35}
+  .stat .value{font-size:18px;margin:4px 0 2px}
+  .stat .hint{font-size:9px;line-height:1.35}
+  .progress{height:5px;margin:6px 0}
+  .wallet-grid{gap:6px}
+  .wallet{padding:8px;min-height:76px;gap:4px;border-radius:12px}
+  .wallet.active{padding:7px}
+  .wallet .emoji,.wallet .platform-logo{width:28px;height:28px}
+  .wallet .wname{font-size:11px}
+  .wallet .owner{font-size:9px;line-height:1.3}
+  .wallet .amount{font-size:10px}
+  .wallet.active:after{right:6px;top:5px}
+  .platform-picker{gap:5px}
+  .platform-choice{min-height:52px;padding:5px 3px;gap:3px;border-radius:10px;font-size:9px}
+  .platform-choice img{width:20px;height:20px}
+  .platform-choice.active{padding:4px 2px}
+  .cols{gap:10px}
+  .result-options{gap:5px;margin-top:4px}
+  .result-choice{min-height:58px;gap:3px;padding:5px 2px;border-radius:10px;font-size:10px;line-height:1.25}
+  .result-choice .result-emoji{font-size:17px}
+  .result-choice.active{padding:4px 1px}
+  .draw-grid{gap:8px}
+  .row{gap:7px}
+  .section-tag{font-size:10px}
+  button{padding:9px 11px;border-radius:10px;font-size:12px}
+  .tiny{font-size:10px;padding:6px 8px}
+  .inputrow{gap:6px}
+  input,select{padding:10px 11px;border-radius:10px;font-size:13px}
+  .outcomes{gap:6px}
+  .outcome{padding:12px 7px;min-height:82px;border-radius:12px}
+  .outcome .big{font-size:20px;margin-bottom:3px}
+  .outcome .small{font-size:10px}
+  .loglist{gap:6px}
+  .log{gap:8px;padding:9px;border-radius:11px}
+  .logicon{width:34px;height:34px;border-radius:10px;font-size:16px}
+  .logtitle{font-size:12px}
+  .logsub{font-size:10px;line-height:1.4}
+  .pill{font-size:9px;padding:3px 6px}
+  .week-summary{gap:4px 8px;padding:9px;border-radius:11px}
+  .week-summary .week-title{font-size:11px}
+  .week-summary .week-detail{font-size:10px;line-height:1.45}
+  .note,.rule{padding:9px;border-radius:10px;font-size:10px;line-height:1.5}
+  .rule b{font-size:12px;margin-bottom:3px}
+  .rule span{font-size:10px}
+  .divider{margin:11px 0}
+  .foot{font-size:10px;padding:8px}
+}
+
 </style></head><body>
 <header><div class="top"><div><div class="brand">MACAU · REWARDS 2026</div><div class="hero">連環賞小管家 🎁</div><div class="sub">簡單點選，記低每個支付錢包抽到嘅優惠券。唔使輸入消費金額、商戶或類型。</div></div><div id="userbadge" class="pill hidden" style="background:#ffffff20;color:white">已登入</div></div></header>
 <main>
