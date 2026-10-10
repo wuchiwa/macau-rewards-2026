@@ -1,0 +1,19 @@
+{
+  "name": "連環賞小管家｜澳門消費連環賞 2026",
+  "short_name": "連環賞小管家",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f7fb",
+  "theme_color": "#102b46",
+  "lang": "zh-Hant",
+  "description": "澳門消費連環賞 2026 個人優惠券記錄工具",
+  "icons": [
+    {
+      "src": "./app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
