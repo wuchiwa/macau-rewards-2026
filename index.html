@@ -271,7 +271,7 @@
 <section class="card global-stats" id="globalStats">
   <div class="global-head">
     <div><div class="section-tag">05 · GLOBAL STATISTICS</div><h2 style="margin:5px 0 4px">全體中獎統計 📊</h2><div class="muted">彙總所有使用者的活動抽獎紀錄，不顯示個人資料。</div></div>
-    <button id="toggleGlobalStats" class="soft tiny" aria-expanded="true">收起詳細統計 ▲</button>
+    <button id="toggleGlobalStats" class="soft tiny" aria-expanded="false">展開詳細統計 ▼</button>
   </div>
   <div id="globalStatsMsg" class="muted" style="margin:8px 0 12px">正在載入全體彙總數據…</div>
   <div class="global-metrics">
@@ -280,9 +280,9 @@
     <div class="global-metric"><span>固定面額券總值</span><strong id="gsValue">—</strong><small>不含兩種券類</small></div>
     <div class="global-metric global-focus"><span>MOP 200 中獎率</span><strong id="gs200Rate">—</strong><small id="gs200Count">—</small></div>
   </div>
-  <div id="globalStatsDetails">
+  <div id="globalStatsDetails" class="hidden">
     <div class="global-subhead"><h3>八大支付平台比較</h3><span>各平台以自身抽獎次數計算中獎率</span></div>
-    <div class="global-table-wrap"><table class="global-table"><thead><tr><th>平台</th><th>抽獎次數</th><th>固定券總值</th><th>平均面額</th><th>MOP 200 率</th></tr></thead><tbody id="gsPlatforms"></tbody></table></div>
+    <div class="global-table-wrap"><table class="global-table"><thead><tr><th>平台</th><th>抽獎次數</th><th>固定券總值</th><th>固定券值／次</th><th>MOP 200 率</th></tr></thead><tbody id="gsPlatforms"></tbody></table></div>
     <div class="global-subhead"><h3>七種抽獎結果分布</h3><span>各結果佔全部有效抽獎的比例</span></div>
     <div id="gsOutcomes" class="global-outcomes"></div>
     <div class="global-two">
