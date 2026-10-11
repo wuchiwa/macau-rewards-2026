@@ -203,6 +203,60 @@
  .week-table-stat>b{font-size:11px}
 }
 
+
+/* Global statistics section */
+.global-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.global-head h2{font-size:18px}
+.global-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin:14px 0}
+.global-metric{border:1px solid var(--line);background:#f8fafc;border-radius:14px;padding:12px;min-width:0;display:flex;flex-direction:column;gap:6px}
+.global-metric span{font-size:11px;color:var(--muted)}
+.global-metric strong{font-size:clamp(19px,2.8vw,26px);line-height:1.2;overflow-wrap:anywhere}
+.global-metric small{font-size:10px;color:var(--muted)}
+.global-metric.global-focus{background:#eff8f3;border-color:#cce7d7}
+.global-metric.global-focus strong{color:#27845e}
+.global-subhead{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:20px 0 9px}
+.global-subhead h3{font-size:14px;margin:0}
+.global-subhead>span{font-size:10px;color:var(--muted);text-align:right}
+.global-table-wrap{overflow-x:auto}
+.global-table{width:100%;border-collapse:collapse;font-size:12px}
+.global-table th,.global-table td{padding:9px 7px;border-bottom:1px solid #edf1f5;text-align:right;white-space:nowrap}
+.global-table th{background:#f6f8fb;color:var(--muted);font-size:10px}
+.global-table th:first-child,.global-table td:first-child{text-align:left}
+.global-table td:first-child{font-weight:750}
+.global-rate{color:#27845e;font-weight:800}
+.global-outcomes{display:grid;gap:10px}
+.global-outcome{display:grid;grid-template-columns:92px minmax(0,1fr) 62px;gap:8px;align-items:center;font-size:11px}
+.global-outcome-name{font-weight:750;word-break:keep-all}
+.global-track{height:8px;background:#edf1f6;border-radius:20px;overflow:hidden}
+.global-track i{display:block;height:100%;background:linear-gradient(90deg,#7fb3f1,#2f68c9);border-radius:20px}
+.global-outcome-value{text-align:right;font-weight:800}
+.global-outcome-value small{display:block;font-weight:500;color:var(--muted);font-size:9px}
+.global-two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.global-bars{height:132px;display:flex;align-items:flex-end;gap:4px;padding:8px 2px 0;border-bottom:1px solid var(--line)}
+.global-bar-item{flex:1;min-width:0;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px}
+.global-bar-num{font-size:9px;color:#65778b}
+.global-bar{width:min(22px,75%);min-height:3px;background:linear-gradient(180deg,#7cb0f0,#2f68c9);border-radius:5px 5px 1px 1px}
+.gold-bars .global-bar{background:linear-gradient(180deg,#f0d080,#c28b2a)}
+.global-bar-label{font-size:9px;color:var(--muted);white-space:nowrap}
+.global-foot{margin-top:12px;font-size:10px}
+@media(max-width:650px){
+ .global-head{align-items:center}
+ .global-head h2{font-size:16px}
+ .global-metrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+ .global-metric{padding:10px;min-height:90px}
+ .global-metric strong{font-size:20px}
+ .global-subhead{align-items:flex-start;flex-direction:column;gap:2px;margin-top:17px}
+ .global-subhead>span{text-align:left}
+ .global-table{font-size:10px;table-layout:auto}
+ .global-table th,.global-table td{padding:8px 5px}
+ .global-outcome{grid-template-columns:78px minmax(0,1fr) 52px;gap:6px;font-size:10px}
+ .global-outcome-name{line-height:1.35}
+ .global-two{grid-template-columns:1fr;gap:10px}
+ .global-bars{height:116px}
+ .global-bar-label{font-size:8px}
+ .global-head .tiny{flex-shrink:0;padding:7px 8px;font-size:10px}
+}
+@media(max-width:370px){.global-outcome{grid-template-columns:68px minmax(0,1fr) 47px;gap:5px}.global-metric strong{font-size:18px}}
 </style></head><body>
 <header><div class="top"><div><div class="brand">MACAU · REWARDS 2026</div><div class="hero">連環賞小管家 🎁</div><div class="sub">簡單點選，記低每個支付錢包抽到嘅優惠券。唔使輸入消費金額、商戶或類型。</div></div><div style="display:flex;align-items:center;gap:5px;flex-shrink:0"><button id="installApp" class="install-link" type="button">＋ 加到桌面</button><div id="userbadge" class="pill hidden" style="background:#ffffff20;color:white">已登入</div></div></div></header>
 <main>
@@ -213,6 +267,31 @@
 <section class="card"><div class="row"><div><div class="section-tag">01 · Select wallet</div><h2 style="margin:5px 0">選擇支付錢包</h2><div class="muted">點選你要記錄嘅錢包；可記錄自己或其他人。</div></div></div><div id="wallets" class="wallet-grid" style="margin-top:15px"></div><div class="divider"></div><div id="addWalletArea"><div class="add-wallet-form"><div class="muted" style="margin-bottom:8px">新增錢包（第 9 個或以上亦適用）</div><label class="muted" for="newOwner">① 先填持有人（留空即自己）</label><input id="newOwner" placeholder="例如：自己、爸爸、媽媽" aria-label="持有人，預設自己" maxlength="50" style="width:100%;max-width:360px;margin:5px 0 12px;font-size:14px"><div class="muted" style="margin-bottom:8px">② 再選擇支付平台</div><div id="platformPicker" class="platform-picker" style="margin-top:2px"></div><select id="newWalletName" class="hidden" aria-label="已選擇支付平台"><option value="MPay">MPay</option><option value="支付寶">支付寶</option><option value="中銀">中銀</option><option value="工銀">工銀</option><option value="豐付寶">豐付寶</option><option value="廣發">廣發</option><option value="LusoPay">LusoPay</option><option value="UePay">UePay</option></select><button id="confirmAddWallet" type="button" class="wallet-action-btn" style="margin-top:12px">＋ 新增所選錢包</button><div class="muted" style="margin-top:8px">③ 按「新增所選錢包」完成，再到下方選擇 3 次抽獎結果。只限以上 8 個合資格支付平台；同一平台可為不同持有人重複新增。</div></div></div><div class="wallet-actions"><span class="pill" id="walletCount">0 個錢包</span><div class="wallet-action-buttons"><button id="showAddWallet" class="soft wallet-action-btn hidden" type="button">＋ 新增錢包</button><button id="deleteWallet" class="danger wallet-action-btn" type="button">刪除所選錢包</button></div></div></section>
 <div class="cols"><section class="card record-card"><div class="record-heading"><div><div class="section-tag">02 · Record result</div><h2 style="margin:5px 0 4px">今次抽到咩？</h2><div class="muted" id="selectedInfo">請先選擇上方錢包</div></div><button id="toggleRecord" class="soft tiny" type="button" aria-expanded="true">收起 ▲</button></div><div id="recordBody"><div class="divider"></div><div class="draw-grid"><div><label class="muted">第 1 次抽獎</label><select id="draw1" class="draw-select-hidden"><option value="merchant_discount">商戶滿減券</option><option value="consumer_benefit">消費禮遇券</option><option value="10">MOP 10</option><option value="20">MOP 20</option><option value="50">MOP 50</option><option value="100">MOP 100</option><option value="200">MOP 200</option></select><div class="result-options" data-draw="draw1"></div></div><div><label class="muted">第 2 次抽獎</label><select id="draw2" class="draw-select-hidden"><option value="merchant_discount">商戶滿減券</option><option value="consumer_benefit">消費禮遇券</option><option value="10">MOP 10</option><option value="20">MOP 20</option><option value="50">MOP 50</option><option value="100">MOP 100</option><option value="200">MOP 200</option></select><div class="result-options" data-draw="draw2"></div></div><div><label class="muted">第 3 次抽獎</label><select id="draw3" class="draw-select-hidden"><option value="merchant_discount">商戶滿減券</option><option value="consumer_benefit">消費禮遇券</option><option value="10">MOP 10</option><option value="20">MOP 20</option><option value="50">MOP 50</option><option value="100">MOP 100</option><option value="200">MOP 200</option></select><div class="result-options" data-draw="draw3"></div></div></div><button id="saveBatch" style="width:100%;margin-top:12px">儲存這組 3 次抽獎</button><div id="recordmsg" class="msg"></div><p class="note" style="margin-top:14px">每次合資格消費有 3 次抽獎機會。先選好 3 次結果再儲存；已記錄的錢包可隨時修改本週結果，每週一組。</p></div></section>
 <section class="card"><div class="row"><div><div class="section-tag">03 · History</div><h2 style="margin:5px 0 4px">最近抽獎記錄</h2></div><div class="inputrow"><button id="redeemPrevious" class="soft tiny hidden">核銷上週全部未核銷優惠券</button><button id="redeemAll" class="soft tiny">核銷全部</button><button id="redeemWalletAll" class="soft tiny">核銷本錢包全部</button><button id="allRecords" class="soft tiny">顯示全部</button></div></div><div class="muted" id="historyHint" style="margin-bottom:12px">顯示所選錢包記錄</div><div id="history" class="loglist"></div></section></div><section class="card event-history-card"><div class="section-tag">04 · EVENT OVERVIEW</div><div class="event-history-heading"><div><h2 style="margin:5px 0 4px">活動十週紀錄</h2><div class="muted">2026.10.09 — 2026.12.17 · 每週五至下週四</div></div><div class="event-total-badge"><strong>10</strong><span>個週期</span></div></div><div id="eventOverview" class="event-overview"></div><div id="weekHistory" class="week-timeline"></div></section>
+
+<section class="card global-stats" id="globalStats">
+  <div class="global-head">
+    <div><div class="section-tag">05 · GLOBAL STATISTICS</div><h2 style="margin:5px 0 4px">全體中獎統計 📊</h2><div class="muted">彙總所有使用者的活動抽獎紀錄，不顯示個人資料。</div></div>
+    <button id="toggleGlobalStats" class="soft tiny" aria-expanded="true">收起詳細統計 ▲</button>
+  </div>
+  <div id="globalStatsMsg" class="muted" style="margin:8px 0 12px">正在載入全體彙總數據…</div>
+  <div class="global-metrics">
+    <div class="global-metric"><span>全體有效抽獎</span><strong id="gsDraws">—</strong><small>七種有效結果</small></div>
+    <div class="global-metric"><span>參與帳戶</span><strong id="gsUsers">—</strong><small>至少有一筆抽獎紀錄</small></div>
+    <div class="global-metric"><span>固定面額券總值</span><strong id="gsValue">—</strong><small>不含兩種券類</small></div>
+    <div class="global-metric global-focus"><span>MOP 200 中獎率</span><strong id="gs200Rate">—</strong><small id="gs200Count">—</small></div>
+  </div>
+  <div id="globalStatsDetails">
+    <div class="global-subhead"><h3>八大支付平台比較</h3><span>各平台以自身抽獎次數計算中獎率</span></div>
+    <div class="global-table-wrap"><table class="global-table"><thead><tr><th>平台</th><th>抽獎次數</th><th>固定券總值</th><th>平均面額</th><th>MOP 200 率</th></tr></thead><tbody id="gsPlatforms"></tbody></table></div>
+    <div class="global-subhead"><h3>七種抽獎結果分布</h3><span>各結果佔全部有效抽獎的比例</span></div>
+    <div id="gsOutcomes" class="global-outcomes"></div>
+    <div class="global-two">
+      <div><div class="global-subhead"><h3>每週抽獎趨勢</h3></div><div id="gsWeekly" class="global-bars"></div></div>
+      <div><div class="global-subhead"><h3>MOP 200 每週中獎</h3></div><div id="gs200Weekly" class="global-bars gold-bars"></div></div>
+    </div>
+    <div class="muted global-foot" id="gsUpdated">統計以雲端已記錄的有效抽獎為準。</div>
+  </div>
+</section>
 <section class="card"><div class="section-tag">使用小貼士</div><h2 style="margin:5px 0 13px">活動規則速覽</h2><div class="rulegrid"><div class="rule"><b>🗓️ 週五至週日</b><span>已實名認證電子錢包，於全澳合資格商戶單筆實付滿 MOP 50，可獲 3 次領取機會；每帳戶每週上限 3 次。</span></div><div class="rule"><b>🟨 商戶滿減券</b><span>黃色券，代表商戶提供的滿額減價優惠；請按券面指定商戶及使用條件消費。</span></div><div class="rule"><b>🟦 消費禮遇券</b><span>藍色券，代表消費禮遇類優惠；實際適用商戶及使用條件以券面說明為準。</span></div><div class="rule"><b>🎟️ 面值券使用</b><span>MOP 10、20、50、100、200 面值券，領取當天即可核銷，最長至緊接週四；每週五凌晨清零。單筆實付須達優惠面值三倍或以上。</span></div><div class="rule"><b>ℹ️ 本 APP 用途</b><span>只作個人手動記錄，不會連接官方系統或自動判斷資格；不記錄長者及殘疾卡 MOP 500 立減優惠。</span></div></div></section>
 <button id="logout" class="soft">登出</button></div>
 <div class="foot">個人記錄工具 · 請以官方活動條款及錢包顯示為準</div>
@@ -267,7 +346,35 @@ function show(){ $('setup').classList.add('hidden');$('auth').classList.toggle('
 $('connect').onclick=async()=>{try{connect();let {data,error}=await db.auth.getSession();if(error)throw error;user=data.session?.user||null;show();if(user)await load();else msg('雲端連線成功，請登入或建立帳戶。',false,'authmsg')}catch(e){msg(e.message,true,'authmsg')}};
 async function auth(signup){try{if(!db)connect();let email=$('email').value.trim(),password=$('password').value;if(!email||password.length<8)throw Error('請輸入電郵及至少 8 位密碼');let r=signup?await db.auth.signUp({email,password}):await db.auth.signInWithPassword({email,password});if(r.error)throw r.error;if(signup&&!r.data.session){msg('註冊成功，請查看電郵完成驗證，再返回登入。',false,'authmsg');return}user=r.data.user;show();await load()}catch(e){msg(e.message,true,'authmsg')}}
 $('login').onclick=()=>auth(false);$('signup').onclick=()=>auth(true);
-async function load(){try{let [w,c]=await Promise.all([db.from('wallets').select('*').order('created_at'),db.from('reward_claims').select('*').order('claimed_on',{ascending:false}).order('created_at',{ascending:false})]);for(let r of [w,c])if(r.error)throw r.error;wallets=w.data||[];claims=c.data||[];if(!activeWallets().some(w=>w.id===selected))selected=activeWallets()[0]?.id||null;render();msg('雲端同步完成。')}catch(e){msg(e.message,true)}}
+
+async function loadGlobalStats(){
+ const box=$('globalStatsMsg');
+ try{
+  const {data,error}=await db.rpc('get_global_reward_stats');
+  if(error)throw error;
+  if(!data)throw Error('雲端未有回傳統計數據。');
+  const fmt=n=>Number(n||0).toLocaleString('en',{maximumFractionDigits:2});
+  const cash=n=>'MOP '+fmt(n);
+  $('gsDraws').textContent=fmt(data.total_draws);
+  $('gsUsers').textContent=fmt(data.user_count);
+  $('gsValue').textContent=cash(data.fixed_value_total);
+  $('gs200Rate').textContent=Number(data.mop200_rate||0).toFixed(2)+'%';
+  $('gs200Count').textContent=fmt(data.mop200_count)+' 次 MOP 200';
+  $('gsPlatforms').innerHTML=(data.platforms||[]).map(p=>'<tr><td>'+esc(p.name)+'</td><td>'+fmt(p.draws)+'</td><td>'+cash(p.fixed_value_total)+'</td><td>'+cash(p.average_fixed_value)+'</td><td class="global-rate">'+Number(p.mop200_rate||0).toFixed(2)+'%</td></tr>').join('');
+  $('gsOutcomes').innerHTML=(data.outcomes||[]).map(o=>'<div class="global-outcome"><div class="global-outcome-name">'+esc(o.name)+'</div><div><div class="global-track"><i style="width:'+Math.min(100,Number(o.share||0))+'%"></i></div><div class="muted" style="font-size:10px;margin-top:3px">'+fmt(o.count)+' 次</div></div><div class="global-outcome-value">'+Number(o.share||0).toFixed(1)+'%<small>佔全部結果</small></div></div>').join('');
+  const bars=(items,key,gold=false)=>{const max=Math.max(1,...items.map(x=>Number(x[key]||0)));return items.map(x=>'<div class="global-bar-item"><div class="global-bar-num">'+fmt(x[key])+'</div><div class="global-bar" style="height:'+Math.max(3,Number(x[key]||0)/max*70)+'%"></div><div class="global-bar-label">第'+x.week+'週</div></div>').join('')};
+  $('gsWeekly').innerHTML=bars(data.weeks||[],'draws');
+  $('gs200Weekly').innerHTML=bars(data.weeks||[],'mop200_count',true);
+  const dt=data.generated_at?new Date(data.generated_at):null;
+  $('gsUpdated').textContent='更新時間：'+(dt&&!isNaN(dt)?dt.toLocaleString():'以目前雲端資料為準')+'。只顯示彙總數字，不包含個人姓名、電郵或原始紀錄。';
+  box.textContent='全體彙總數據已載入。';
+ }catch(e){
+  box.textContent='全體統計暫時未能載入：'+(e.message||'未知錯誤')+'。個人記錄功能不受影響。';
+ }
+}
+$('toggleGlobalStats').onclick=()=>{const d=$('globalStatsDetails'),open=d.classList.toggle('hidden');$('toggleGlobalStats').textContent=open?'展開詳細統計 ▼':'收起詳細統計 ▲';$('toggleGlobalStats').setAttribute('aria-expanded',String(!open))};
+
+async function load(){try{let [w,c]=await Promise.all([db.from('wallets').select('*').order('created_at'),db.from('reward_claims').select('*').order('claimed_on',{ascending:false}).order('created_at',{ascending:false})]);for(let r of [w,c])if(r.error)throw r.error;wallets=w.data||[];claims=c.data||[];if(!activeWallets().some(w=>w.id===selected))selected=activeWallets()[0]?.id||null;render();loadGlobalStats();msg('雲端同步完成。')}catch(e){msg(e.message,true)}}
 function weeklyClaims(wid){let start=weekStart();return claims.some(c=>c.wallet_id===wid&&c.claimed_on>=start)}
 function activeWallets(){return wallets.filter(w=>!w.is_archived)}
 function selectedWallet(){return activeWallets().find(w=>w.id===selected)}
