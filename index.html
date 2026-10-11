@@ -343,7 +343,7 @@ function datePlus(dateStr,n){let d=new Date(dateStr+'T12:00:00');d.setDate(d.get
 function money(n){return 'MOP '+Number(n||0).toLocaleString('en',{maximumFractionDigits:0})}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function msg(s,error=false,id='msg'){$(id).textContent=s;$(id).className='msg'+(error?' error':'')}
-function connect(){if(!window.supabase)throw Error('雲端連線程式載入失敗，請檢查網絡後重新整理。');db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY)}
+function connect(){if(!window.supabase)throw Error('雲端連線程式載入失敗，請檢查網絡後重新整理。');if(!db){db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);db.auth.onAuthStateChange((event)=>{if(event==='PASSWORD_RECOVERY'){$('auth').classList.remove('hidden');$('app').classList.add('hidden');$('userbadge').classList.add('hidden');$('resetPasswordPanel').classList.remove('hidden');msg('已開啟密碼重設程序，請輸入新密碼。',false,'authmsg')}})}}
 function show(){ $('setup').classList.add('hidden');$('auth').classList.toggle('hidden',!!user);$('app').classList.toggle('hidden',!user);$('userbadge').classList.toggle('hidden',!user)}
 $('connect').onclick=async()=>{try{connect();let {data,error}=await db.auth.getSession();if(error)throw error;user=data.session?.user||null;show();if(user)await load();else msg('雲端連線成功，請登入或建立帳戶。',false,'authmsg')}catch(e){msg(e.message,true,'authmsg')}};
 async function auth(signup){try{if(!db)connect();let email=$('email').value.trim(),password=$('password').value;if(!email||password.length<8)throw Error('請輸入電郵及至少 8 位密碼');let r=signup?await db.auth.signUp({email,password}):await db.auth.signInWithPassword({email,password});if(r.error)throw r.error;if(signup&&!r.data.session){msg('註冊成功，請查看電郵完成驗證，再返回登入。',false,'authmsg');return}user=r.data.user;show();await load()}catch(e){msg(e.message,true,'authmsg')}}
@@ -376,15 +376,7 @@ $('saveNewPassword').onclick=async()=>{
   user=null;show();
  }catch(e){msg('更新密碼失敗：'+(e.message||'請重新開啟重設電郵連結。'),true,'authmsg')}
 };
-db.auth.onAuthStateChange((event)=>{
- if(event==='PASSWORD_RECOVERY'){
-  $('auth').classList.remove('hidden');
-  $('app').classList.add('hidden');
-  $('userbadge').classList.add('hidden');
-  $('resetPasswordPanel').classList.remove('hidden');
-  msg('已開啟密碼重設程序，請輸入新密碼。',false,'authmsg');
- }
-});
+
 
 
 async function loadGlobalStats(){
