@@ -355,10 +355,16 @@ async function sendPasswordReset(){
   const email=$('email').value.trim();
   if(!email)throw Error('請先在電郵欄輸入註冊時使用的電郵。');
   const redirectTo=window.location.origin+window.location.pathname;
+  const button=$('forgotPassword');
+  button.disabled=true;button.textContent='正在發送…';
   const {error}=await db.auth.resetPasswordForEmail(email,{redirectTo});
   if(error)throw error;
-  msg('如果此電郵已註冊，系統會寄出密碼重設連結。請查看收件箱及垃圾郵件匣，再按電郵連結返回本 APP。',false,'authmsg');
- }catch(e){msg('未能發送重設電郵：'+(e.message||'請稍後再試。'),true,'authmsg')}
+  button.textContent='已發送重設電郵 ✓';
+  button.disabled=false;
+  msg('已發送重設電郵！請到「'+email+'」的收件箱查看，亦請檢查垃圾郵件匣。開啟郵件中的連結即可設定新密碼。',false,'authmsg');
+  $('authmsg').style.cssText='display:block;background:#eaf8f0;border:1px solid #9bd7b5;border-radius:12px;padding:12px 14px;margin-top:12px;color:#176b45;font-size:14px;font-weight:600;line-height:1.7';
+  button.onclick=()=>{button.textContent='重新發送重設電郵';button.onclick=sendPasswordReset};
+ }catch(e){const button=$('forgotPassword');button.disabled=false;button.textContent='忘記密碼？';msg('未能發送重設電郵：'+(e.message||'請稍後再試。'),true,'authmsg')}
 }
 $('forgotPassword').onclick=sendPasswordReset;
 $('saveNewPassword').onclick=async()=>{
