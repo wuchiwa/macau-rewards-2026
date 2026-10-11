@@ -257,11 +257,13 @@
  .global-head .tiny{flex-shrink:0;padding:7px 8px;font-size:10px}
 }
 @media(max-width:370px){.global-outcome{grid-template-columns:68px minmax(0,1fr) 47px;gap:5px}.global-metric strong{font-size:18px}}
+
+.link-button{background:transparent!important;color:var(--blue)!important;padding:3px 0!important;font-size:13px!important;font-weight:700;text-decoration:underline;text-underline-offset:3px;box-shadow:none!important}
 </style></head><body>
 <header><div class="top"><div><div class="brand">MACAU · REWARDS 2026</div><div class="hero">連環賞小管家 🎁</div><div class="sub">簡單點選，記低每個支付錢包抽到嘅優惠券。唔使輸入消費金額、商戶或類型。</div></div><div style="display:flex;align-items:center;gap:5px;flex-shrink:0"><button id="installApp" class="install-link" type="button">＋ 加到桌面</button><div id="userbadge" class="pill hidden" style="background:#ffffff20;color:white">已登入</div></div></div></header>
 <main>
 <section id="setup" class="card hidden" aria-hidden="true"><input id="url" type="hidden" aria-label="Project URL"><input id="key" type="hidden" aria-label="Publishable key"><button id="connect" class="hidden" type="button" tabindex="-1" aria-hidden="true">連接</button><div id="setupmsg" class="msg"></div></section>
-<section id="auth" class="card hidden"><h2>登入／建立帳戶</h2><div class="cols"><div><label class="muted">電郵</label><input id="email" type="email" autocomplete="email" placeholder="you@example.com" style="width:100%;margin:6px 0 10px"><label class="muted">密碼（至少 8 位）</label><input id="password" type="password" autocomplete="current-password" placeholder="輸入密碼" style="width:100%;margin:6px 0 10px"><div class="inputrow"><button id="login">登入</button><button id="signup" class="soft">註冊新帳戶</button></div></div><p class="muted">同一帳戶可在手機、平板及電腦同步。如果註冊後要求電郵驗證，請先完成驗證。</p></div><div id="authmsg" class="msg"></div></section>
+<section id="auth" class="card hidden"><h2>登入／建立帳戶</h2><div class="cols"><div><label class="muted">電郵</label><input id="email" type="email" autocomplete="email" placeholder="you@example.com" style="width:100%;margin:6px 0 10px"><label class="muted">密碼（至少 8 位）</label><input id="password" type="password" autocomplete="current-password" placeholder="輸入密碼" style="width:100%;margin:6px 0 10px"><div class="inputrow"><button id="login">登入</button><button id="signup" class="soft">註冊新帳戶</button></div><div style="margin-top:9px"><button id="forgotPassword" type="button" class="link-button">忘記密碼？</button></div></div><p class="muted">同一帳戶可在手機、平板及電腦同步。如果註冊後要求電郵驗證，請先完成驗證。</p></div><div id="resetPasswordPanel" class="hidden" style="margin-top:14px;padding:14px;border:1px solid var(--line);border-radius:14px;background:#f8fafc"><h3 style="font-size:15px;margin:0 0 8px">設定新密碼</h3><label class="muted" for="newPassword">新密碼（至少 8 位）</label><input id="newPassword" type="password" autocomplete="new-password" placeholder="輸入新密碼" style="width:100%;margin:5px 0 10px"><label class="muted" for="confirmPassword">再次輸入新密碼</label><input id="confirmPassword" type="password" autocomplete="new-password" placeholder="再次輸入新密碼" style="width:100%;margin:5px 0 10px"><button id="saveNewPassword" type="button">儲存新密碼</button></div><div id="authmsg" class="msg"></div></section>
 <div id="app" class="hidden">
 <div id="msg" class="msg" style="margin:0 0 12px"></div><div class="grid" style="margin-bottom:16px"><div class="stat"><div class="label">本週抽獎次數</div><div class="value" id="weekCount">0 次</div><div class="progress"><span id="progress" style="width:0%"></span></div><div class="hint" id="weekHint">每週五凌晨重設</div></div><div class="stat"><div class="label">抽中優惠券總額</div><div class="value" id="totalValue">MOP 0</div><div class="hint">只計已記錄嘅優惠券</div></div><div class="stat stat-spend"><div class="label">本週未核銷券｜所需消費</div><div class="value" id="unused">MOP 0</div><div class="hint" id="unusedHint">未核銷券面額總和 × 3</div></div></div>
 <section class="card"><div class="row"><div><div class="section-tag">01 · Select wallet</div><h2 style="margin:5px 0">選擇支付錢包</h2><div class="muted">點選你要記錄嘅錢包；可記錄自己或其他人。</div></div></div><div id="wallets" class="wallet-grid" style="margin-top:15px"></div><div class="divider"></div><div id="addWalletArea"><div class="add-wallet-form"><div class="muted" style="margin-bottom:8px">新增錢包（第 9 個或以上亦適用）</div><label class="muted" for="newOwner">① 先填持有人（留空即自己）</label><input id="newOwner" placeholder="例如：自己、爸爸、媽媽" aria-label="持有人，預設自己" maxlength="50" style="width:100%;max-width:360px;margin:5px 0 12px;font-size:14px"><div class="muted" style="margin-bottom:8px">② 再選擇支付平台</div><div id="platformPicker" class="platform-picker" style="margin-top:2px"></div><select id="newWalletName" class="hidden" aria-label="已選擇支付平台"><option value="MPay">MPay</option><option value="支付寶">支付寶</option><option value="中銀">中銀</option><option value="工銀">工銀</option><option value="豐付寶">豐付寶</option><option value="廣發">廣發</option><option value="LusoPay">LusoPay</option><option value="UePay">UePay</option></select><button id="confirmAddWallet" type="button" class="wallet-action-btn" style="margin-top:12px">＋ 新增所選錢包</button><div class="muted" style="margin-top:8px">③ 按「新增所選錢包」完成，再到下方選擇 3 次抽獎結果。只限以上 8 個合資格支付平台；同一平台可為不同持有人重複新增。</div></div></div><div class="wallet-actions"><span class="pill" id="walletCount">0 個錢包</span><div class="wallet-action-buttons"><button id="showAddWallet" class="soft wallet-action-btn hidden" type="button">＋ 新增錢包</button><button id="deleteWallet" class="danger wallet-action-btn" type="button">刪除所選錢包</button></div></div></section>
@@ -346,6 +348,44 @@ function show(){ $('setup').classList.add('hidden');$('auth').classList.toggle('
 $('connect').onclick=async()=>{try{connect();let {data,error}=await db.auth.getSession();if(error)throw error;user=data.session?.user||null;show();if(user)await load();else msg('雲端連線成功，請登入或建立帳戶。',false,'authmsg')}catch(e){msg(e.message,true,'authmsg')}};
 async function auth(signup){try{if(!db)connect();let email=$('email').value.trim(),password=$('password').value;if(!email||password.length<8)throw Error('請輸入電郵及至少 8 位密碼');let r=signup?await db.auth.signUp({email,password}):await db.auth.signInWithPassword({email,password});if(r.error)throw r.error;if(signup&&!r.data.session){msg('註冊成功，請查看電郵完成驗證，再返回登入。',false,'authmsg');return}user=r.data.user;show();await load()}catch(e){msg(e.message,true,'authmsg')}}
 $('login').onclick=()=>auth(false);$('signup').onclick=()=>auth(true);
+
+async function sendPasswordReset(){
+ try{
+  if(!db)connect();
+  const email=$('email').value.trim();
+  if(!email)throw Error('請先在電郵欄輸入註冊時使用的電郵。');
+  const redirectTo=window.location.origin+window.location.pathname;
+  const {error}=await db.auth.resetPasswordForEmail(email,{redirectTo});
+  if(error)throw error;
+  msg('如果此電郵已註冊，系統會寄出密碼重設連結。請查看收件箱及垃圾郵件匣，再按電郵連結返回本 APP。',false,'authmsg');
+ }catch(e){msg('未能發送重設電郵：'+(e.message||'請稍後再試。'),true,'authmsg')}
+}
+$('forgotPassword').onclick=sendPasswordReset;
+$('saveNewPassword').onclick=async()=>{
+ try{
+  const password=$('newPassword').value,confirm=$('confirmPassword').value;
+  if(password.length<8)throw Error('新密碼至少需要 8 位。');
+  if(password!==confirm)throw Error('兩次輸入的密碼不一致。');
+  const {error}=await db.auth.updateUser({password});
+  if(error)throw error;
+  $('resetPasswordPanel').classList.add('hidden');
+  $('password').value='';
+  $('newPassword').value='';$('confirmPassword').value='';
+  msg('密碼已更新。請使用新密碼登入。',false,'authmsg');
+  await db.auth.signOut();
+  user=null;show();
+ }catch(e){msg('更新密碼失敗：'+(e.message||'請重新開啟重設電郵連結。'),true,'authmsg')}
+};
+db.auth.onAuthStateChange((event)=>{
+ if(event==='PASSWORD_RECOVERY'){
+  $('auth').classList.remove('hidden');
+  $('app').classList.add('hidden');
+  $('userbadge').classList.add('hidden');
+  $('resetPasswordPanel').classList.remove('hidden');
+  msg('已開啟密碼重設程序，請輸入新密碼。',false,'authmsg');
+ }
+});
+
 
 async function loadGlobalStats(){
  const box=$('globalStatsMsg');
