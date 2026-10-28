@@ -325,7 +325,7 @@ main {
 .draw-select-hidden {
   display:none!important
 }
-@media(max-width:700px) {
+@media (max-width: 700px) {
   header {
     padding:18px 18px 24px
   }
@@ -631,7 +631,7 @@ button:disabled {
   font-size:11px;
   padding:12px
 }
-@media(max-width:700px) {
+@media (max-width: 700px) {
   header {
     padding:20px 17px 24px
   }
@@ -671,8 +671,9 @@ button:disabled {
     font-size:25px
   }
 }
+/* ===== Mobile layout: compact baseline ===== */
 /* Compact mobile layout: preserve desktop spacing and all existing behavior */
-@media(max-width:700px) {
+@media (max-width: 700px) {
   header {
     padding:14px 13px 16px
   }
@@ -905,11 +906,12 @@ button:disabled {
     padding:8px
   }
 }
+/* ===== Header and install link refinements ===== */
 /* Small home-screen install link beside the signed-in badge */
 .install-link {
   display:none!important
 }
-@media(max-width:700px) {
+@media (max-width: 700px) {
   .install-link {
     display:inline-flex!important;
     align-items:center;
@@ -928,6 +930,7 @@ button:disabled {
     gap:8px
   }
 }
+/* ===== Wallet management actions ===== */
 /* Wallet count left; equally sized add/delete actions right */
 .wallet-actions {
   display:flex;
@@ -948,7 +951,7 @@ button:disabled {
   min-height:38px;
   white-space:nowrap
 }
-@media(max-width:700px) {
+@media (max-width: 700px) {
   .wallet-actions {
     margin-top:12px;
     gap:6px
@@ -970,13 +973,14 @@ button:disabled {
   color:#16734b;
   font-weight:800
 }
-@media(max-width:700px) {
+@media (max-width: 700px) {
   .stat-spend .value {
     font-size:clamp(14px,4.2vw,18px);
     white-space:nowrap;
     letter-spacing:-.02em
   }
 }
+/* ===== Dashboard statistic cards ===== */
 /* Unified top dashboard statistic cards */
 #app>.grid[style*="margin-bottom:16px"] {
   align-items:stretch;
@@ -1032,7 +1036,7 @@ button:disabled {
   font-weight:900;
   white-space:nowrap
 }
-@media(max-width:700px) {
+@media (max-width: 700px) {
   #app>.grid[style*="margin-bottom:16px"] {
     gap:6px;
     margin-bottom:12px!important
@@ -1065,6 +1069,7 @@ button:disabled {
     letter-spacing:-.045em
   }
 }
+/* ===== Add-wallet flow ===== */
 /* Clear, step-by-step wallet creation flow */
 .add-wallet-form {
   padding:12px;
@@ -1098,7 +1103,7 @@ button:disabled {
   border-radius:6px;
   padding:2px 4px
 }
-@media(max-width:700px) {
+@media (max-width: 700px) {
   .add-wallet-form {
     padding:10px
   }
@@ -1106,6 +1111,7 @@ button:disabled {
     max-width:none
   }
 }
+/* ===== Record-result panel ===== */
 /* Collapsible record-result panel */
 .record-heading {
   display:flex;
@@ -1120,7 +1126,7 @@ button:disabled {
   flex-shrink:0;
   margin-top:2px
 }
-@media(max-width:700px) {
+@media (max-width: 700px) {
   .record-heading {
     gap:6px
   }
@@ -1129,6 +1135,7 @@ button:disabled {
     padding:7px 9px
   }
 }
+/* ===== Ten-week history and timeline ===== */
 /* Premium compact ten-week timeline */
 .event-history-card {
   overflow:hidden
@@ -1419,7 +1426,7 @@ button:disabled {
   color:#8a97a6;
   font-size:12px
 }
-@media(max-width:520px) {
+@media (max-width: 520px) {
   .event-overview {
     padding:10px
   }
@@ -1495,7 +1502,7 @@ button:disabled {
   font-weight:650;
   color:#60758a
 }
-@media(max-width:520px) {
+@media (max-width: 520px) {
   .event-stat-focus {
     padding:9px 7px
   }
@@ -1506,6 +1513,7 @@ button:disabled {
     margin-top:10px
   }
 }
+/* ===== Ten-week summary table ===== */
 /* Compact statistical table for the ten-week summary */
 .week-timeline {
   display:block;
@@ -1591,7 +1599,7 @@ button:disabled {
 .week-table-stat:nth-child(3)>b {
   color:#32785b
 }
-@media(max-width:600px) {
+@media (max-width: 600px) {
   .week-timeline {
     overflow-x:auto
   }
@@ -1620,6 +1628,7 @@ button:disabled {
     font-size:11px
   }
 }
+/* ===== Global statistics ===== */
 /* Global statistics section */
 .global-head {
   display:flex;
@@ -1793,7 +1802,7 @@ button:disabled {
   margin-top:12px;
   font-size:10px
 }
-@media(max-width:650px) {
+@media (max-width: 650px) {
   .global-head {
     align-items:center
   }
@@ -1851,7 +1860,7 @@ button:disabled {
     font-size:10px
   }
 }
-@media(max-width:370px) {
+@media (max-width: 370px) {
   .global-outcome {
     grid-template-columns:68px minmax(0,1fr) 47px;
     gap:5px
