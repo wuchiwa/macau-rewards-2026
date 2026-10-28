@@ -11,10 +11,11 @@ https://wuchiwa.github.io/macau-rewards-2026/
 - 使用電郵及密碼登入／註冊；不同使用者的資料按登入帳戶分開儲存。
 - 自動連接已設定的 Supabase 雲端資料庫；介面不再顯示「連接雲端帳戶」設定區。
 - 同一帳戶可在手機、平板及電腦登入並同步記錄。
-- 新增及選擇支付錢包，可記錄不同持有人；同一支付平台可以建立多個錢包。
-- 記錄 7 種優惠券結果：商戶滿減券、消費禮遇券，以及 MOP 10、MOP 20、MOP 50、MOP 100、MOP 200。
+- 支援以下支付錢包：MPay、支付寶、中銀、工銀、豐付寶、廣發、LusoPay、UePay；可新增多個錢包及記錄不同持有人。
+- 記錄兩類優惠券：黃色「商戶滿減券」及藍色「消費禮遇券」，面額為 MOP 10、20、50、100、200。
+- 按活動週次記錄各錢包的抽獎結果；每個錢包每週最多記錄 3 張優惠券。
 - 顯示本週抽獎次數、已記錄優惠券總額、本週未核銷優惠券，以及按券面額 × 3 計算的所需消費金額。
-- 查看優惠券歷史、核銷狀態及活動週次；可核銷未核銷的優惠券。
+- 查看優惠券歷史、週次及核銷狀態，並可核銷未使用的優惠券。
 - 不要求輸入消費金額、商戶或消費類型。
 - 不記錄長者／殘疾人士卡的 MOP 500 即時立減優惠。
 
@@ -26,12 +27,12 @@ https://wuchiwa.github.io/macau-rewards-2026/
 
 ## 部署與設定
 
-1. 在 Supabase 專案套用 schema.sql（若資料表已建立，更新前先確認現有結構，不要盲目重建）。
+1. 在 Supabase 專案套用 `schema.sql` 前，先確認現有資料表及結構；若資料表已存在，不要盲目重建。
 2. 在 Supabase Auth 設定電郵登入，並按需要設定註冊及電郵驗證。
-3. GitHub 專案 Settings → Pages → Deploy from a branch → 選擇 main 分支及 /(root)。
+3. 在 GitHub 專案 Settings → Pages → Deploy from a branch，選擇 `main` 分支及 `/(root)`。
 4. 開啟 APP 網址並登入，或按「註冊新帳戶」建立帳戶。
 
-前端使用 Supabase Project URL 及 Publishable key，Publishable key 會出現在瀏覽器端，屬正常設計。切勿把 Supabase Secret 或 service_role key 放進前端。請確保資料表啟用 Row Level Security（RLS），並使用以登入使用者 auth.uid() 限制資料存取的政策。
+前端使用 Supabase Project URL 及 Publishable key。Publishable key 會出現在瀏覽器端，屬正常設計；切勿把 Supabase Secret 或 `service_role` key 放進前端。請確保資料表啟用 Row Level Security（RLS），並使用以登入使用者 `auth.uid()` 限制資料存取的政策。
 
 ## 注意事項
 
