@@ -1,55 +1,7 @@
 <!doctype html>
 <html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#2459d3"><title>優惠券核銷策略測試頁</title>
-<style>
-:root{--bg:#f4f6fa;--card:#fff;--ink:#182230;--muted:#748094;--line:#e7ebf1;--blue:#315fce;--blue2:#edf3ff;--green:#16845b;--greenbg:#eff9f3;--shadow:0 8px 28px rgba(25,42,70,.055)}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:system-ui,-apple-system,"Noto Sans TC",sans-serif;color:var(--ink)}
-main{max-width:780px;margin:auto;padding:26px 16px 56px}
-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 2px 20px}
-h1{font-size:23px;letter-spacing:-.4px;margin:0}h2{font-size:16px;margin:0;font-weight:750}
-.sub{font-size:12px;color:var(--muted);margin-top:5px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:19px;margin:12px 0;box-shadow:var(--shadow)}
-.cardhead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
-.status{font-size:12px;color:var(--muted);padding:7px 10px;background:#f1f4f8;border-radius:99px;line-height:1.4}
-.status:empty{display:none}
-label{display:block;font-size:12px;color:#536074;font-weight:700;margin-bottom:7px}
-input,select{width:100%;font:inherit;font-size:14px;padding:12px 13px;border:1px solid #dce2eb;border-radius:11px;background:#fff;color:var(--ink);outline:none}
-input:focus,select:focus{border-color:#7c9bea;box-shadow:0 0 0 3px #315fce14}
-.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.btn{border:0;border-radius:11px;background:var(--blue);color:#fff;font:inherit;font-size:14px;font-weight:750;padding:13px 17px;cursor:pointer}
-.btn.secondary{background:var(--blue2);color:var(--blue)}
-.btn.full{width:100%;margin-top:14px}
-.btn.small{padding:8px 11px;font-size:12px}
-.authrow{display:grid;grid-template-columns:1fr 1fr auto;gap:9px;align-items:end}
-.authrow .btn{height:43px;white-space:nowrap}
-.wallets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
-.wallet{border:1px solid var(--line);border-radius:13px;padding:11px;min-width:0}
-.wallet strong{display:block;font-size:13px;margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.chips{display:flex;flex-wrap:wrap;gap:5px;min-height:24px}
-.chip{border-radius:7px;padding:5px 7px;font-size:12px;font-weight:750;background:#fff1c7;color:#755600}
-.chip.blue{background:#e6efff;color:#2455a5}
-.wallet .muted{font-size:11px;margin:7px 0 0}
-.muted{color:var(--muted);font-size:12px;line-height:1.5}
-.hint{margin:10px 1px 0}
-.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
-.stat{background:#f4f6fa;border-radius:12px;padding:12px}
-.stat span{display:block;font-size:11px;color:var(--muted);line-height:1.4}
-.stat strong{display:block;font-size:20px;margin-top:5px;letter-spacing:-.3px}
-.result{background:var(--greenbg);border:1px solid #d5ecdf;border-radius:14px;padding:15px;margin-top:12px}
-.result h3{margin:0 0 9px;font-size:15px}
-.result p{font-size:12px;line-height:1.6;margin:7px 0;color:#52665c}
-.payrow{display:grid;grid-template-columns:1fr auto;align-items:center;gap:5px 12px;padding:13px;margin:9px 0;border:1px solid #d5e8dd;border-radius:12px;background:#fff;font-size:13px;line-height:1.6}
-.payrow:last-child{border:0}
-.pill{display:inline-block;background:#dcefe6;color:#126746;padding:3px 8px;border-radius:99px;font-size:11px;font-weight:750}
-details{border-top:1px solid var(--line);margin-top:15px;padding-top:13px}
-summary{font-size:13px;font-weight:700;color:#43516a;cursor:pointer;list-style:none}
-summary:after{content:"＋";float:right;color:var(--blue)}
-details[open] summary:after{content:"－"}
-#inputs{margin-top:14px}
-#inputs>div{margin-bottom:10px}
-#inputs input{padding:9px 11px;font-size:13px}
-.error{color:#b42318;font-size:12px;margin-top:8px}
-@media(max-width:600px){main{padding:18px 11px 36px}header{margin-bottom:14px}h1{font-size:20px}.card{padding:15px;border-radius:15px}.wallets{grid-template-columns:repeat(2,minmax(0,1fr))}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.stat strong{font-size:19px}.authrow{grid-template-columns:1fr 1fr}.authrow .btn{grid-column:1/-1;width:100%}}
-.paywallet{font-size:15px;font-weight:800;color:#174f3a}.payamount{font-size:21px;font-weight:850;color:#126746;white-space:nowrap}.paymeta{grid-column:1/-1;padding-top:5px;border-top:1px solid #edf2ee;color:#52665c;font-size:12px;line-height:1.7}</style></head><body><main>
+<link rel="stylesheet" href="../css/common.css?v=1">
+<link rel="stylesheet" href="../css/calculator.css?v=1"></head><body><main>
 <header><div><h1>優惠券核銷計算器</h1><div class="sub">讀取個人雲端券庫 · 僅供試算，不會更改資料</div></div><span class="status" id="cloudStatus">檢查登入中…</span></header>
 <section class="card" id="cloudAuth">
  <div class="cardhead"><h2>登入你的帳戶</h2></div>
