@@ -93,17 +93,18 @@ function money(n){return 'MOP '+Number(n).toLocaleString('en-US',{maximumFractio
 function expiryDate(claim){const d=new Date(String(claim.claimed_on)+'T12:00:00');const days=(4-d.getDay()+7)%7;d.setDate(d.getDate()+days);return d.toISOString().slice(0,10)}
 function todayLocal(){const d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10)}
 function showStatus(msg,error=false){statusBox.textContent=msg;statusBox.style.color=error?'#b42318':'#16845b'}
+function walletLabel(w){const name=String(w.name||'');const owner=String(w.owner_name||'');return escapeHtml(name)+(owner&&owner!=='自己'&&!name.includes(owner)?' · '+escapeHtml(owner):'')}
 function renderWallets(){
  const active=walletRows.filter(w=>!w.is_archived);
  walletBox.innerHTML=active.map(w=>{
   const cs=couponRows.filter(c=>c.wallet_id===w.id);
-  return '<div class="wallet"><strong>'+escapeHtml(w.name)+(w.owner_name&&w.owner_name!=='自己'?' · '+escapeHtml(w.owner_name):'')+'</strong><div class="chips">'+(cs.length?cs.map(x=>'<span class="chip '+(Number(x.coupon_value)<50?'blue':'')+'">'+Number(x.coupon_value)+'</span>').join(''):'<span class="muted">沒有可用券</span>')+'</div><p class="muted">可用 '+cs.length+' 張 · '+money(cs.reduce((s,x)=>s+Number(x.coupon_value||0),0))+'</p></div>';
+  return '<div class="wallet"><strong>'+walletLabel(w)+'</strong><div class="chips">'+(cs.length?cs.map(x=>'<span class="chip '+(Number(x.coupon_value)<50?'blue':'')+'">'+Number(x.coupon_value)+'</span>').join(''):'<span class="muted">沒有可用券</span>')+'</div><p class="muted">可用 '+cs.length+' 張 · '+money(cs.reduce((s,x)=>s+Number(x.coupon_value||0),0))+'</p></div>';
  }).join('')||'<div class="muted">帳戶目前沒有可用錢包。</div>';
  inputs.innerHTML=active.map(w=>{
   const cs=couponRows.filter(c=>c.wallet_id===w.id);
   const vals=cs.map(x=>x.coupon_value).join(',');
   walletInputs[w.id]=vals;
-  return '<div><label for="wallet_'+w.id+'">'+escapeHtml(w.name)+(w.owner_name&&w.owner_name!=='自己'?' · '+escapeHtml(w.owner_name):'')+'</label><input id="wallet_'+w.id+'" data-wallet="'+w.id+'" value="'+vals+'" inputmode="decimal" placeholder="沒有優惠券"></div>';
+  return '<div><label for="wallet_'+w.id+'">'+walletLabel(w)+'</label><input id="wallet_'+w.id+'" data-wallet="'+w.id+'" value="'+vals+'" inputmode="decimal" placeholder="沒有優惠券"></div>';
  }).join('')||'<p class="muted">沒有錢包可供計算。</p>';
  const max=document.getElementById('maxTx');
  const old=Number(max.value)||3;
@@ -124,7 +125,7 @@ function readCoupons(){
  }
  return out;
 }
-function refreshWallets(){try{const data=readCoupons();walletBox.innerHTML=walletRows.filter(w=>!w.is_archived).map(w=>{const cs=data.filter(c=>c.wallet===w.id);return '<div class="wallet"><strong>'+escapeHtml(w.name)+(w.owner_name&&w.owner_name!=='自己'?' · '+escapeHtml(w.owner_name):'')+'</strong><div class="chips">'+(cs.length?cs.map(c=>'<span class="chip '+(c.value<50?'blue':'')+'">'+c.value+'</span>').join(''):'<span class="muted">沒有優惠券</span>')+'</div><p class="muted">共 '+cs.length+' 張 · '+money(cs.reduce((s,c)=>s+c.value,0))+'</p></div>'}).join('');document.getElementById('inputError').textContent='';return true}catch(e){document.getElementById('inputError').textContent=e.message;return false}}
+function refreshWallets(){try{const data=readCoupons();walletBox.innerHTML=walletRows.filter(w=>!w.is_archived).map(w=>{const cs=data.filter(c=>c.wallet===w.id);return '<div class="wallet"><strong>'+walletLabel(w)+'</strong><div class="chips">'+(cs.length?cs.map(c=>'<span class="chip '+(c.value<50?'blue':'')+'">'+c.value+'</span>').join(''):'<span class="muted">沒有優惠券</span>')+'</div><p class="muted">共 '+cs.length+' 張 · '+money(cs.reduce((s,c)=>s+c.value,0))+'</p></div>'}).join('');document.getElementById('inputError').textContent='';return true}catch(e){document.getElementById('inputError').textContent=e.message;return false}}
 async function loadCloudData(){
  if(!currentUser){showStatus('請先登入正式 APP 使用的帳戶。',true);return}
  showStatus('正在讀取你的錢包及優惠券…');
