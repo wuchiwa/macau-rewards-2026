@@ -1,3 +1,4 @@
+/* Shared design tokens and safe cross-page base styles */
 :root {
   --navy:#102b46;
   --blue:#2867d8;
@@ -7,4 +8,15 @@
   --muted:#6b7d90;
   --line:#e3eaf2;
   --gold:#ffefc2
+}
+
+* {
+  box-sizing:border-box
+}
+
+body {
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif
 }
