@@ -1,14 +1,84 @@
 <!doctype html>
 <html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#2459d3"><title>優惠券核銷策略測試頁</title>
 <style>
-:root{--bg:#f5f7fb;--card:#fff;--ink:#172033;--muted:#687386;--line:#e4e9f1;--blue:#2459d3;--green:#16845b;--yellow:#fff1b8;--bluecoupon:#dce9ff}*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:system-ui,-apple-system,"Noto Sans TC",sans-serif;color:var(--ink)}main{max-width:850px;margin:auto;padding:20px 14px 44px}.hero{background:linear-gradient(135deg,#183c91,#3674e9);color:#fff;padding:24px;border-radius:22px;margin-bottom:16px}.hero h1{margin:0 0 8px;font-size:25px}.hero p{margin:0;color:#e2eaff;line-height:1.6}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin:14px 0;box-shadow:0 4px 16px #14213b08}.card h2{font-size:18px;margin:0 0 12px}.muted{color:var(--muted);font-size:13px;line-height:1.55}.wallets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.wallet{border:1px solid var(--line);border-radius:14px;padding:13px}.wallet strong{display:block;margin-bottom:8px}.chips{display:flex;flex-wrap:wrap;gap:6px}.chip{border-radius:9px;padding:7px 9px;font-size:13px;font-weight:700;background:var(--yellow);color:#725400}.chip.blue{background:var(--bluecoupon);color:#214e9d}label{display:block;font-size:14px;font-weight:650;margin-bottom:7px}input,select{width:100%;font:inherit;padding:12px;border:1px solid #cbd4e2;border-radius:11px;background:#fff;color:var(--ink)}.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.btn{width:100%;border:0;border-radius:12px;background:var(--blue);color:#fff;font:inherit;font-weight:750;padding:14px;margin-top:14px;cursor:pointer}.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.stat{background:#f3f6fb;border-radius:13px;padding:12px}.stat span{display:block;font-size:12px;color:var(--muted)}.stat strong{display:block;font-size:21px;margin-top:4px}.result{border:1px solid #b8d8c9;background:#f0faf5;border-radius:14px;padding:15px;margin-top:12px}.result h3{margin:0 0 8px;font-size:17px}.payrow{padding:11px 0;border-bottom:1px solid #d6e9df}.payrow:last-child{border:0}.pill{display:inline-block;background:#dcefe6;color:#126746;padding:4px 8px;border-radius:99px;font-size:12px;font-weight:700}.warn{background:#fff8e7;border:1px solid #f1dda5;border-radius:12px;padding:12px;font-size:13px;line-height:1.55;margin-top:12px}@media(max-width:520px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}main{padding:12px 10px 30px}.hero{padding:20px}.hero h1{font-size:22px}.wallets,.fields{grid-template-columns:1fr}.stat strong{font-size:18px}.card{padding:15px}}
+:root{--bg:#f4f6fa;--card:#fff;--ink:#182230;--muted:#748094;--line:#e7ebf1;--blue:#315fce;--blue2:#edf3ff;--green:#16845b;--greenbg:#eff9f3;--shadow:0 8px 28px rgba(25,42,70,.055)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:system-ui,-apple-system,"Noto Sans TC",sans-serif;color:var(--ink)}
+main{max-width:780px;margin:auto;padding:26px 16px 56px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 2px 20px}
+h1{font-size:23px;letter-spacing:-.4px;margin:0}h2{font-size:16px;margin:0;font-weight:750}
+.sub{font-size:12px;color:var(--muted);margin-top:5px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:19px;margin:12px 0;box-shadow:var(--shadow)}
+.cardhead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
+.status{font-size:12px;color:var(--muted);padding:7px 10px;background:#f1f4f8;border-radius:99px;line-height:1.4}
+.status:empty{display:none}
+label{display:block;font-size:12px;color:#536074;font-weight:700;margin-bottom:7px}
+input,select{width:100%;font:inherit;font-size:14px;padding:12px 13px;border:1px solid #dce2eb;border-radius:11px;background:#fff;color:var(--ink);outline:none}
+input:focus,select:focus{border-color:#7c9bea;box-shadow:0 0 0 3px #315fce14}
+.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.btn{border:0;border-radius:11px;background:var(--blue);color:#fff;font:inherit;font-size:14px;font-weight:750;padding:13px 17px;cursor:pointer}
+.btn.secondary{background:var(--blue2);color:var(--blue)}
+.btn.full{width:100%;margin-top:14px}
+.btn.small{padding:8px 11px;font-size:12px}
+.authrow{display:grid;grid-template-columns:1fr 1fr auto;gap:9px;align-items:end}
+.authrow .btn{height:43px;white-space:nowrap}
+.wallets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.wallet{border:1px solid var(--line);border-radius:13px;padding:11px;min-width:0}
+.wallet strong{display:block;font-size:13px;margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chips{display:flex;flex-wrap:wrap;gap:5px;min-height:24px}
+.chip{border-radius:7px;padding:5px 7px;font-size:12px;font-weight:750;background:#fff1c7;color:#755600}
+.chip.blue{background:#e6efff;color:#2455a5}
+.wallet .muted{font-size:11px;margin:7px 0 0}
+.muted{color:var(--muted);font-size:12px;line-height:1.5}
+.hint{margin:10px 1px 0}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.stat{background:#f4f6fa;border-radius:12px;padding:12px}
+.stat span{display:block;font-size:11px;color:var(--muted);line-height:1.4}
+.stat strong{display:block;font-size:20px;margin-top:5px;letter-spacing:-.3px}
+.result{background:var(--greenbg);border:1px solid #d5ecdf;border-radius:14px;padding:15px;margin-top:12px}
+.result h3{margin:0 0 9px;font-size:15px}
+.result p{font-size:12px;line-height:1.6;margin:7px 0;color:#52665c}
+.payrow{padding:11px 0;border-bottom:1px solid #dcebe2;font-size:13px;line-height:1.6}
+.payrow:last-child{border:0}
+.pill{display:inline-block;background:#dcefe6;color:#126746;padding:3px 8px;border-radius:99px;font-size:11px;font-weight:750}
+details{border-top:1px solid var(--line);margin-top:15px;padding-top:13px}
+summary{font-size:13px;font-weight:700;color:#43516a;cursor:pointer;list-style:none}
+summary:after{content:"＋";float:right;color:var(--blue)}
+details[open] summary:after{content:"－"}
+#inputs{margin-top:14px}
+#inputs>div{margin-bottom:10px}
+#inputs input{padding:9px 11px;font-size:13px}
+.error{color:#b42318;font-size:12px;margin-top:8px}
+@media(max-width:600px){main{padding:18px 11px 36px}header{margin-bottom:14px}h1{font-size:20px}.card{padding:15px;border-radius:15px}.wallets{grid-template-columns:repeat(2,minmax(0,1fr))}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.stat strong{font-size:19px}.authrow{grid-template-columns:1fr 1fr}.authrow .btn{grid-column:1/-1;width:100%}}
 </style></head><body><main>
-<section class="hero"><h1>優惠券核銷策略測試</h1><p>獨立網頁測試版｜已預設 8 個錢包的示範券庫，每個錢包最多 3 張。只測試計算，不會修改正式 APP 或雲端資料。</p></section>
-<section class="card" id="cloudAuth"><h2>連接你的優惠券資料</h2><p class="muted">使用正式「連環賞小管家」相同的登入電郵及密碼。登入後會讀取你自己的錢包及未核銷優惠券。</p><div class="fields"><div><label for="email">登入電郵</label><input id="email" type="email" autocomplete="username"></div><div><label for="password">密碼</label><input id="password" type="password" autocomplete="current-password"></div></div><button class="btn" id="loginCloud">登入並讀取雲端資料</button></section><section class="card"><div class="row"><h2>雲端資料</h2><div><button class="soft tiny" id="reloadCloud">重新讀取</button> <button class="soft tiny" id="logoutCloud">登出</button></div></div><p id="cloudStatus" class="muted">正在檢查登入狀態…</p></section><section class="card"><h2>① 目前可用優惠券</h2><div class="wallets" id="wallets"></div><p class="muted" id="walletCountHint">登入後自動讀取雲端錢包及可用優惠券。面額可在本頁臨時修改測試，不會寫回雲端。</p>
-<div class="fields"><div><label for="spend">本次消費金額（MOP）</label><input id="spend" type="number" min="1" value="260" step="0.01"></div><div><label for="maxTx">商戶最多接受幾個錢包付款</label><select id="maxTx"><option value="1">1 個錢包</option><option value="2">2 個錢包</option><option value="3" selected>3 個錢包</option><option value="4">4 個錢包</option><option value="8">不限（最多 8 個）</option></select></div><div><label for="mode">策略偏好</label><select id="mode"><option value="use" selected>優先核銷最高總券值，再減少錢包數</option><option value="few">先減少錢包數，再盡量用券</option></select></div></div><button class="btn" id="calculate">計算建議方案</button></section>
-<section class="card"><h2>② 計算結果</h2><div id="summary" class="muted">輸入消費金額後，按「計算建議方案」。</div><div id="details"></div></section>
-<section class="card"><h2>③ 自訂券面額</h2><p class="muted">以下面額由雲端優惠券載入，可在此暫時修改或刪除以測試不同組合；不會修改正式 APP 的紀錄。</p><div class="fields" id="inputs"></div><button class="btn" id="refresh">更新券清單</button><div id="inputError" class="muted"></div></section>
-<div class="warn"><strong>計算說明：</strong>每張券不可拆分；總核銷券值最多只可達總消費額的三分之一；每張券不可拆分，零頭不能換算成額外券值。同一錢包同一筆付款可核銷多張券，但付款金額至少要達到「該次所用所有優惠券面額合計 × 3」。系統先選符合條件的較大面額券；例如消費 30 元只核銷一張 10 元券，90 元可核銷三張 10 元券，150 元核銷 50 元券，180 元可核銷 50 元及 10 元券。</div>
+<header><div><h1>優惠券核銷計算器</h1><div class="sub">讀取個人雲端券庫 · 僅供試算，不會更改資料</div></div><span class="status" id="cloudStatus">檢查登入中…</span></header>
+<section class="card" id="cloudAuth">
+ <div class="cardhead"><h2>登入你的帳戶</h2></div>
+ <div class="authrow"><div><label for="email">電郵</label><input id="email" type="email" autocomplete="username" placeholder="登入電郵"></div><div><label for="password">密碼</label><input id="password" type="password" autocomplete="current-password" placeholder="登入密碼"></div><button class="btn" id="loginCloud">登入並載入</button></div>
+</section>
+<section class="card">
+ <div class="cardhead"><h2>我的可用優惠券</h2><div><button class="btn secondary small" id="reloadCloud">重新載入</button> <button class="btn secondary small" id="logoutCloud">登出</button></div></div>
+ <div class="wallets" id="wallets"></div>
+ <div class="muted hint" id="walletCountHint">登入後自動顯示錢包及可用優惠券。</div>
+</section>
+<section class="card">
+ <div class="cardhead"><h2>消費及付款設定</h2></div>
+ <div class="fields">
+  <div><label for="spend">消費金額（MOP）</label><input id="spend" type="number" min="1" value="260" step="0.01"></div>
+  <div><label for="maxTx">最多使用錢包數</label><select id="maxTx"><option value="1">1 個</option><option value="2">2 個</option><option value="3" selected>3 個</option><option value="4">4 個</option><option value="8">不限（最多 8 個）</option></select></div>
+  <div style="grid-column:1/-1"><label for="mode">計算策略</label><select id="mode"><option value="use" selected>最高核銷券值</option><option value="few">最少付款錢包</option></select></div>
+ </div>
+ <button class="btn full" id="calculate">計算最佳方案</button>
+</section>
+<section class="card">
+ <div class="cardhead"><h2>計算結果</h2></div>
+ <div id="summary" class="muted">輸入消費金額，按「計算最佳方案」。</div><div id="details"></div>
+</section>
+<section class="card">
+ <details><summary>調整優惠券面額（只影響本次試算）</summary>
+  <p class="muted">修改或刪除面額後，按「更新券庫」。不會改動雲端紀錄。</p>
+  <div class="fields" id="inputs"></div><button class="btn secondary full" id="refresh">更新券庫</button><div id="inputError" class="error"></div>
+ </details>
+</section>
 </main><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const SUPABASE_URL='https://wokoioenlqtsmhyobxko.supabase.co';
@@ -39,7 +109,7 @@ function renderWallets(){
  const old=Number(max.value)||3;
  max.innerHTML=Array.from({length:Math.max(1,active.length)},(_,i)=>'<option value="'+(i+1)+'">'+(i+1)+' 個錢包</option>').join('');
  max.value=String(Math.min(old,Math.max(1,active.length)));
- document.getElementById('walletCountHint').textContent='已讀取 '+active.length+' 個錢包、'+couponRows.length+' 張未核銷且未過期的優惠券。';
+ document.getElementById('walletCountHint').textContent=active.length+' 個錢包 · '+couponRows.length+' 張可用券';
 }
 function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
 function readCoupons(){
@@ -67,7 +137,7 @@ async function loadCloudData(){
  const today=todayLocal();
  couponRows=(c.data||[]).filter(x=>Number(x.coupon_value)>0&&expiryDate(x)>=today&&walletRows.some(w=>w.id===x.wallet_id&&!w.is_archived));
  renderWallets();
- showStatus('已連接雲端：'+walletRows.filter(w=>!w.is_archived).length+' 個錢包、'+couponRows.length+' 張可用優惠券。資料只讀取，計算不會更改雲端紀錄。');
+ showStatus('已同步 · '+walletRows.filter(w=>!w.is_archived).length+' 個錢包 · '+couponRows.length+' 張可用券');
  calculate();
 }
 async function authIn(){
