@@ -11,17 +11,6 @@
   --greenbg:#eff9f3;
   --shadow:0 5px 20px #193a5707
 }
-*
-{
-  box-sizing:border-box
-}
-body
-{
-  margin:0;
-  background:var(--bg);
-  font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
-  color:var(--ink)
-}
 main
 {
   max-width:780px;
