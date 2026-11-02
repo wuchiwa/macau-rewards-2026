@@ -37,7 +37,7 @@ input:focus,select:focus{border-color:#7c9bea;box-shadow:0 0 0 3px #315fce14}
 .result{background:var(--greenbg);border:1px solid #d5ecdf;border-radius:14px;padding:15px;margin-top:12px}
 .result h3{margin:0 0 9px;font-size:15px}
 .result p{font-size:12px;line-height:1.6;margin:7px 0;color:#52665c}
-.payrow{padding:11px 0;border-bottom:1px solid #dcebe2;font-size:13px;line-height:1.6}
+.payrow{display:grid;grid-template-columns:1fr auto;align-items:center;gap:5px 12px;padding:13px;margin:9px 0;border:1px solid #d5e8dd;border-radius:12px;background:#fff;font-size:13px;line-height:1.6}
 .payrow:last-child{border:0}
 .pill{display:inline-block;background:#dcefe6;color:#126746;padding:3px 8px;border-radius:99px;font-size:11px;font-weight:750}
 details{border-top:1px solid var(--line);margin-top:15px;padding-top:13px}
@@ -188,7 +188,9 @@ function calculate(){
  const allocations=best.payments.map(p=>({...p,amount:p.minimum}));
  if(allocations.length)allocations[allocations.length-1].amount+=spend-best.minTotal;
  const total=all.reduce((s,c)=>s+c.value,0),uncovered=Math.max(0,spend-best.minTotal);
- summary.innerHTML='<div class="stats"><div class="stat"><span>能核銷券值</span><strong style="color:var(--green)">'+money(best.sum)+'</strong></div><div class="stat"><span>能核銷錢包</span><strong>'+allocations.length+' 個</strong></div><div class="stat"><span>核銷所需最低消費額</span><strong>'+money(best.minTotal)+'</strong></div><div class="stat"><span>未能涵蓋消費額</span><strong>'+money(uncovered)+'</strong></div></div><div class="result"><h3>建議付款分配</h3><p>消費總額為 '+money(spend)+'。優惠券抵扣 '+money(best.sum)+'，消費者實際支出為 '+money(spend-best.sum)+'。核銷所需最低消費額是各錢包所用優惠券面額合計的 3 倍。</p><p><strong>整體金額：</strong>消費總額 '+money(spend)+'　｜　優惠券抵扣 '+money(best.sum)+'　｜　消費者實際支出 '+money(spend-best.sum)+'</p>'+allocations.map((p,i)=>'<div class="payrow"><span class="pill">消費分配 '+(i+1)+'</span>　<strong>'+escapeHtml(p.walletName)+'</strong> 消費金額 <strong>'+money(p.amount)+'</strong><br><span class="muted">使用優惠券：'+p.coupons.map(c=>money(c.value)).join('、')+'（共 '+money(p.coupons.reduce((s,c)=>s+c.value,0))+'） · 消費者實際支出 '+money(p.amount-p.coupons.reduce((s,c)=>s+c.value,0))+' · 核銷最低消費額 '+money(p.minimum)+'</span></div>').join('')+'<p><strong>未使用券值：'+money(total-best.sum)+'；消費分配合計：'+money(allocations.reduce((s,p)=>s+p.amount,0))+'。</strong></p></div>';
+  const unused=all.filter(c=>!chosen.some(x=>x.id===c.id)),unusedValue=unused.reduce((s,c)=>s+c.value,0),allUsed=unused.length===0;
+  const statusText=allUsed?'✓ 所有有面額的可用優惠券已全部使用':'尚有 '+unused.length+' 張有面額的優惠券未使用（合共 '+money(unusedValue)+'）';
+  summary.innerHTML='<div class="stats"><div class="stat"><span>能核銷券值</span><strong style="color:var(--green)">'+money(best.sum)+'</strong></div><div class="stat"><span>能核銷錢包</span><strong>'+allocations.length+' 個</strong></div><div class="stat"><span>核銷所需最低消費額</span><strong>'+money(best.minTotal)+'</strong></div><div class="stat"><span>未能涵蓋消費額</span><strong>'+money(uncovered)+'</strong></div></div><div class="result"><h3>建議付款分配</h3><p>消費總額 '+money(spend)+' · 優惠券抵扣 '+money(best.sum)+' · 消費者實際支出 '+money(spend-best.sum)+'</p><div class="coupon-status '+(allUsed?'':'partial')+'">'+statusText+'</div>'+allocations.map((p,i)=>'<div class="payrow"><div><div class="paywallet">'+escapeHtml(p.walletName)+'</div><span class="pill">第 '+(i+1)+' 個付款錢包</span></div><div class="payamount">'+money(p.amount)+'</div><div class="paymeta">使用優惠券：'+p.coupons.map(c=>money(c.value)).join('、')+'（共 '+money(p.coupons.reduce((s,c)=>s+c.value,0))+'）<br>核銷最低消費額 '+money(p.minimum)+' · 付款後實際支出 '+money(p.amount-p.coupons.reduce((s,c)=>s+c.value,0))+'</div></div>').join('')+'<p><strong>未使用券值：'+money(unusedValue)+'；分配消費合計：'+money(allocations.reduce((s,p)=>s+p.amount,0))+'。</strong></p></div>';
  details.innerHTML='';
 }
 document.getElementById('calculate').addEventListener('click',calculate);
