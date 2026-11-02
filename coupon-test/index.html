@@ -4,60 +4,126 @@
 :root{--bg:#f5f7fb;--card:#fff;--ink:#172033;--muted:#687386;--line:#e4e9f1;--blue:#2459d3;--green:#16845b;--yellow:#fff1b8;--bluecoupon:#dce9ff}*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:system-ui,-apple-system,"Noto Sans TC",sans-serif;color:var(--ink)}main{max-width:850px;margin:auto;padding:20px 14px 44px}.hero{background:linear-gradient(135deg,#183c91,#3674e9);color:#fff;padding:24px;border-radius:22px;margin-bottom:16px}.hero h1{margin:0 0 8px;font-size:25px}.hero p{margin:0;color:#e2eaff;line-height:1.6}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin:14px 0;box-shadow:0 4px 16px #14213b08}.card h2{font-size:18px;margin:0 0 12px}.muted{color:var(--muted);font-size:13px;line-height:1.55}.wallets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.wallet{border:1px solid var(--line);border-radius:14px;padding:13px}.wallet strong{display:block;margin-bottom:8px}.chips{display:flex;flex-wrap:wrap;gap:6px}.chip{border-radius:9px;padding:7px 9px;font-size:13px;font-weight:700;background:var(--yellow);color:#725400}.chip.blue{background:var(--bluecoupon);color:#214e9d}label{display:block;font-size:14px;font-weight:650;margin-bottom:7px}input,select{width:100%;font:inherit;padding:12px;border:1px solid #cbd4e2;border-radius:11px;background:#fff;color:var(--ink)}.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.btn{width:100%;border:0;border-radius:12px;background:var(--blue);color:#fff;font:inherit;font-weight:750;padding:14px;margin-top:14px;cursor:pointer}.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.stat{background:#f3f6fb;border-radius:13px;padding:12px}.stat span{display:block;font-size:12px;color:var(--muted)}.stat strong{display:block;font-size:21px;margin-top:4px}.result{border:1px solid #b8d8c9;background:#f0faf5;border-radius:14px;padding:15px;margin-top:12px}.result h3{margin:0 0 8px;font-size:17px}.payrow{padding:11px 0;border-bottom:1px solid #d6e9df}.payrow:last-child{border:0}.pill{display:inline-block;background:#dcefe6;color:#126746;padding:4px 8px;border-radius:99px;font-size:12px;font-weight:700}.warn{background:#fff8e7;border:1px solid #f1dda5;border-radius:12px;padding:12px;font-size:13px;line-height:1.55;margin-top:12px}@media(max-width:520px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}main{padding:12px 10px 30px}.hero{padding:20px}.hero h1{font-size:22px}.wallets,.fields{grid-template-columns:1fr}.stat strong{font-size:18px}.card{padding:15px}}
 </style></head><body><main>
 <section class="hero"><h1>優惠券核銷策略測試</h1><p>獨立網頁測試版｜已預設 8 個錢包的示範券庫，每個錢包最多 3 張。只測試計算，不會修改正式 APP 或雲端資料。</p></section>
-<section class="card"><h2>① 目前可用優惠券</h2><div class="wallets" id="wallets"></div><p class="muted">以下預設券庫來自你提供的截圖，可直接修改。每個錢包最多 3 張券。</p>
+<section class="card" id="cloudAuth"><h2>連接你的優惠券資料</h2><p class="muted">使用正式「連環賞小管家」相同的登入電郵及密碼。登入後會讀取你自己的錢包及未核銷優惠券。</p><div class="fields"><div><label for="email">登入電郵</label><input id="email" type="email" autocomplete="username"></div><div><label for="password">密碼</label><input id="password" type="password" autocomplete="current-password"></div></div><button class="btn" id="loginCloud">登入並讀取雲端資料</button></section><section class="card"><div class="row"><h2>雲端資料</h2><div><button class="soft tiny" id="reloadCloud">重新讀取</button> <button class="soft tiny" id="logoutCloud">登出</button></div></div><p id="cloudStatus" class="muted">正在檢查登入狀態…</p></section><section class="card"><h2>① 目前可用優惠券</h2><div class="wallets" id="wallets"></div><p class="muted" id="walletCountHint">登入後自動讀取雲端錢包及可用優惠券。面額可在本頁臨時修改測試，不會寫回雲端。</p>
 <div class="fields"><div><label for="spend">本次消費金額（MOP）</label><input id="spend" type="number" min="1" value="260" step="0.01"></div><div><label for="maxTx">商戶最多接受幾個錢包付款</label><select id="maxTx"><option value="1">1 個錢包</option><option value="2">2 個錢包</option><option value="3" selected>3 個錢包</option><option value="4">4 個錢包</option><option value="8">不限（最多 8 個）</option></select></div><div><label for="mode">策略偏好</label><select id="mode"><option value="use" selected>優先核銷最高總券值，再減少錢包數</option><option value="few">先減少錢包數，再盡量用券</option></select></div></div><button class="btn" id="calculate">計算建議方案</button></section>
 <section class="card"><h2>② 計算結果</h2><div id="summary" class="muted">輸入消費金額後，按「計算建議方案」。</div><div id="details"></div></section>
-<section class="card"><h2>③ 自訂券面額</h2><p class="muted">每個錢包一行，使用逗號分隔面額，例如 100,50 或 10,10,10。留空表示沒有券；每個錢包最多 3 張。</p><div class="fields" id="inputs"></div><button class="btn" id="refresh">更新券清單</button><div id="inputError" class="muted"></div></section>
+<section class="card"><h2>③ 自訂券面額</h2><p class="muted">以下面額由雲端優惠券載入，可在此暫時修改或刪除以測試不同組合；不會修改正式 APP 的紀錄。</p><div class="fields" id="inputs"></div><button class="btn" id="refresh">更新券清單</button><div id="inputError" class="muted"></div></section>
 <div class="warn"><strong>計算說明：</strong>每張券不可拆分；總核銷券值最多只可達總消費額的三分之一；每張券不可拆分，零頭不能換算成額外券值。同一錢包同一筆付款可核銷多張券，但付款金額至少要達到「該次所用所有優惠券面額合計 × 3」。系統先選符合條件的較大面額券；例如消費 30 元只核銷一張 10 元券，90 元可核銷三張 10 元券，150 元核銷 50 元券，180 元可核銷 50 元及 10 元券。</div>
-</main><script>
-const defaults={a:"200,100,50",b:"20,10",c:"10,10,10",d:"50,100",e:"20,50,10",f:"100,10,10",g:"50,20,10",h:"10,10,20"};
-const labels={a:"錢包 A",b:"錢包 B",c:"錢包 C",d:"錢包 D",e:"錢包 E",f:"錢包 F",g:"錢包 G",h:"錢包 H"};
-const inputs=document.getElementById("inputs");
-inputs.innerHTML=Object.keys(defaults).map(k=>'<div><label for="'+k+'">'+labels[k]+'</label><input id="'+k+'" value="'+defaults[k]+'" inputmode="decimal"></div>').join("");
-function parse(id){const raw=document.getElementById(id).value.trim();if(!raw)return [];return raw.split(",").map(x=>Number(x.trim())).filter(x=>Number.isFinite(x)&&x>0).map((value,i)=>({value,wallet:id.toUpperCase(),id:id+"-"+i}));}
-function getCoupons(){return Object.keys(defaults).flatMap(parse)}
-function money(n){return "MOP "+Number(n).toLocaleString("en-US",{maximumFractionDigits:2})}
-function refreshWallets(){let error=[];const data=getCoupons();document.getElementById("wallets").innerHTML=Object.keys(defaults).map(id=>{const cs=data.filter(c=>c.wallet===id.toUpperCase());if(cs.length>3)error.push(labels[id]+"超過 3 張券");return '<div class="wallet"><strong>'+labels[id]+'</strong><div class="chips">'+(cs.length?cs.map(c=>'<span class="chip '+(c.value<50?'blue':'')+'">'+c.value+'</span>').join(""):'<span class="muted">暫無優惠券</span>')+'</div><p class="muted">共 '+cs.length+' 張 · '+money(cs.reduce((s,c)=>s+c.value,0))+'</p></div>'}).join("");document.getElementById("inputError").textContent=error.join("；");return !error.length}
-function calculate(){const spend=Number(document.getElementById("spend").value)||0,maxWallets=Number(document.getElementById("maxTx").value),mode=document.getElementById("mode").value,all=getCoupons(),summary=document.getElementById("summary"),details=document.getElementById("details");if(!refreshWallets()){summary.textContent="請先修正每個錢包最多 3 張券的限制。";details.innerHTML="";return}if(spend<=0){summary.textContent="請輸入大於 0 的消費金額。";details.innerHTML="";return}
-// 按錢包分組做多重選擇背包 DP：每個錢包最多 3 張券，最多只有 8 種選法（含不使用）。
-// 核銷最低消費額 = 券值總和 × 3，因此只需按總券值及使用錢包數保留最佳狀態。
-const walletIds=Object.keys(defaults);
-const limitCents=Math.floor((spend/3)*100+1e-8);
-const walletsData=walletIds.map(id=>({id:id.toUpperCase(),coupons:all.filter(c=>c.wallet===id.toUpperCase())}));
-let dp=new Map([['0|0',{count:0,sumCents:0,choices:[]} ]]);
-for(const wallet of walletsData){
-  const options=[{sumCents:0,coupons:[]}];
-  const m=wallet.coupons.length;
+</main><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL='https://wokoioenlqtsmhyobxko.supabase.co';
+const SUPABASE_KEY='sb_publishable_Ds1oRszcoozkgZju6o1L9w_HP60YnpO';
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let currentUser=null, walletRows=[], couponRows=[], walletInputs={};
+const inputs=document.getElementById('inputs');
+const walletBox=document.getElementById('wallets');
+const authBox=document.getElementById('cloudAuth');
+const statusBox=document.getElementById('cloudStatus');
+function money(n){return 'MOP '+Number(n).toLocaleString('en-US',{maximumFractionDigits:2})}
+function expiryDate(claim){const d=new Date(String(claim.claimed_on)+'T12:00:00');const days=(4-d.getDay()+7)%7;d.setDate(d.getDate()+days);return d.toISOString().slice(0,10)}
+function todayLocal(){const d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10)}
+function showStatus(msg,error=false){statusBox.textContent=msg;statusBox.style.color=error?'#b42318':'#16845b'}
+function renderWallets(){
+ const active=walletRows.filter(w=>!w.is_archived);
+ walletBox.innerHTML=active.map(w=>{
+  const cs=couponRows.filter(c=>c.wallet_id===w.id);
+  return '<div class="wallet"><strong>'+escapeHtml(w.name)+(w.owner_name&&w.owner_name!=='自己'?' · '+escapeHtml(w.owner_name):'')+'</strong><div class="chips">'+(cs.length?cs.map(x=>'<span class="chip '+(Number(x.coupon_value)<50?'blue':'')+'">'+Number(x.coupon_value)+'</span>').join(''):'<span class="muted">沒有可用券</span>')+'</div><p class="muted">可用 '+cs.length+' 張 · '+money(cs.reduce((s,x)=>s+Number(x.coupon_value||0),0))+'</p></div>';
+ }).join('')||'<div class="muted">帳戶目前沒有可用錢包。</div>';
+ inputs.innerHTML=active.map(w=>{
+  const cs=couponRows.filter(c=>c.wallet_id===w.id);
+  const vals=cs.map(x=>x.coupon_value).join(',');
+  walletInputs[w.id]=vals;
+  return '<div><label for="wallet_'+w.id+'">'+escapeHtml(w.name)+(w.owner_name&&w.owner_name!=='自己'?' · '+escapeHtml(w.owner_name):'')+'</label><input id="wallet_'+w.id+'" data-wallet="'+w.id+'" value="'+vals+'" inputmode="decimal" placeholder="沒有優惠券"></div>';
+ }).join('')||'<p class="muted">沒有錢包可供計算。</p>';
+ const max=document.getElementById('maxTx');
+ const old=Number(max.value)||3;
+ max.innerHTML=Array.from({length:Math.max(1,active.length)},(_,i)=>'<option value="'+(i+1)+'">'+(i+1)+' 個錢包</option>').join('');
+ max.value=String(Math.min(old,Math.max(1,active.length)));
+ document.getElementById('walletCountHint').textContent='已讀取 '+active.length+' 個錢包、'+couponRows.length+' 張未核銷且未過期的優惠券。';
+}
+function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
+function readCoupons(){
+ const out=[];
+ for(const w of walletRows.filter(x=>!x.is_archived)){
+  const el=document.getElementById('wallet_'+w.id);
+  const raw=el?el.value.trim():'';
+  if(!raw)continue;
+  const vals=raw.split(',').map(x=>Number(x.trim()));
+  if(vals.some(x=>!Number.isFinite(x)||x<=0))throw Error('錢包「'+w.name+'」有無效面額，請檢查輸入。');
+  vals.forEach((value,i)=>out.push({value,wallet:w.id,walletName:w.name,id:w.id+'-'+i}));
+ }
+ return out;
+}
+function refreshWallets(){try{const data=readCoupons();walletBox.innerHTML=walletRows.filter(w=>!w.is_archived).map(w=>{const cs=data.filter(c=>c.wallet===w.id);return '<div class="wallet"><strong>'+escapeHtml(w.name)+(w.owner_name&&w.owner_name!=='自己'?' · '+escapeHtml(w.owner_name):'')+'</strong><div class="chips">'+(cs.length?cs.map(c=>'<span class="chip '+(c.value<50?'blue':'')+'">'+c.value+'</span>').join(''):'<span class="muted">沒有優惠券</span>')+'</div><p class="muted">共 '+cs.length+' 張 · '+money(cs.reduce((s,c)=>s+c.value,0))+'</p></div>'}).join('');document.getElementById('inputError').textContent='';return true}catch(e){document.getElementById('inputError').textContent=e.message;return false}}
+async function loadCloudData(){
+ if(!currentUser){showStatus('請先登入正式 APP 使用的帳戶。',true);return}
+ showStatus('正在讀取你的錢包及優惠券…');
+ const [w,c]=await Promise.all([
+  db.from('wallets').select('id,name,owner_name,is_archived,created_at').eq('user_id',currentUser.id).order('created_at'),
+  db.from('reward_claims').select('id,wallet_id,claimed_on,coupon_value,redeemed,result_type').eq('user_id',currentUser.id).eq('result_type','coupon').eq('redeemed',false).not('coupon_value','is',null).order('claimed_on',{ascending:false})
+ ]);
+ if(w.error)throw w.error;if(c.error)throw c.error;
+ walletRows=w.data||[];
+ const today=todayLocal();
+ couponRows=(c.data||[]).filter(x=>Number(x.coupon_value)>0&&expiryDate(x)>=today&&walletRows.some(w=>w.id===x.wallet_id&&!w.is_archived));
+ renderWallets();
+ showStatus('已連接雲端：'+walletRows.filter(w=>!w.is_archived).length+' 個錢包、'+couponRows.length+' 張可用優惠券。資料只讀取，計算不會更改雲端紀錄。');
+ calculate();
+}
+async function authIn(){
+ const email=document.getElementById('email').value.trim(),password=document.getElementById('password').value;
+ if(!email||!password)throw Error('請輸入正式 APP 的登入電郵及密碼。');
+ const {data,error}=await db.auth.signInWithPassword({email,password});
+ if(error)throw error;
+ currentUser=data.user;authBox.classList.add('hidden');await loadCloudData();
+}
+async function initAuth(){
+ const {data,error}=await db.auth.getSession();if(error)throw error;
+ currentUser=data.session?.user||null;
+ if(currentUser){authBox.classList.add('hidden');await loadCloudData()}else{authBox.classList.remove('hidden');showStatus('尚未登入。請使用正式 APP 的同一帳戶登入。')}
+ db.auth.onAuthStateChange((event,session)=>{currentUser=session?.user||null;if(!currentUser){walletRows=[];couponRows=[];walletBox.innerHTML='';inputs.innerHTML='';authBox.classList.remove('hidden');showStatus('已登出，請重新登入。',true)}else if(event==='SIGNED_IN'){authBox.classList.add('hidden');loadCloudData().catch(e=>showStatus(e.message,true))}});
+}
+function calculate(){
+ const spend=Number(document.getElementById('spend').value)||0,maxWallets=Number(document.getElementById('maxTx').value),mode=document.getElementById('mode').value,summary=document.getElementById('summary'),details=document.getElementById('details');
+ let all;try{all=readCoupons()}catch(e){summary.textContent=e.message;details.innerHTML='';return}
+ if(spend<=0){summary.textContent='請輸入大於 0 的消費金額。';details.innerHTML='';return}
+ const limitCents=Math.floor((spend/3)*100+1e-8);
+ const walletGroups=walletRows.filter(w=>!w.is_archived).map(w=>({id:w.id,name:w.name,coupons:all.filter(c=>c.wallet===w.id)}));
+ let dp=new Map([['0|0',{count:0,sumCents:0,choices:[]} ]]);
+ for(const wallet of walletGroups){
+  const options=[{sumCents:0,coupons:[]}],m=wallet.coupons.length;
   for(let mask=1;mask<(1<<m);mask++){
-    const picked=wallet.coupons.filter((_,i)=>mask&(1<<i));
-    const sumCents=picked.reduce((s,x)=>s+Math.round(x.value*100),0);
-    if(sumCents<=limitCents)options.push({sumCents,coupons:picked});
+   const picked=wallet.coupons.filter((_,i)=>mask&(1<<i));
+   const sumCents=picked.reduce((s,x)=>s+Math.round(x.value*100),0);
+   if(sumCents<=limitCents)options.push({sumCents,coupons:picked});
   }
   const next=new Map(dp);
-  for(const state of dp.values()){
-    for(const option of options){
-      if(!option.coupons.length)continue;
-      const count=state.count+1;
-      if(count>maxWallets)continue;
-      const sumCents=state.sumCents+option.sumCents;
-      if(sumCents>limitCents)continue;
-      const key=count+'|'+sumCents;
-      if(!next.has(key))next.set(key,{count,sumCents,choices:[...state.choices,{wallet:wallet.id,coupons:option.coupons}]});
-    }
+  for(const state of dp.values())for(const option of options){
+   if(!option.coupons.length)continue;
+   const count=state.count+1;if(count>maxWallets)continue;
+   const sumCents=state.sumCents+option.sumCents;if(sumCents>limitCents)continue;
+   const key=count+'|'+sumCents;
+   if(!next.has(key))next.set(key,{count,sumCents,choices:[...state.choices,{wallet:wallet.id,walletName:wallet.name,coupons:option.coupons}]});
   }
   dp=next;
+ }
+ const candidates=[...dp.values()].filter(s=>s.count>0);
+ candidates.sort((a,b)=>mode==='use'?(b.sumCents-a.sumCents)||(a.count-b.count):(a.count-b.count)||(b.sumCents-a.sumCents));
+ const selected=candidates[0]||{count:0,sumCents:0,choices:[]};
+ const chosen=selected.choices.flatMap(x=>x.coupons),sum=selected.sumCents/100;
+ const payments=selected.choices.map(x=>({wallet:x.wallet,walletName:x.walletName,coupons:x.coupons,minimum:x.coupons.reduce((s,c)=>s+c.value,0)*3}));
+ const minTotal=payments.reduce((s,p)=>s+p.minimum,0),best={chosen,sum,payments,minTotal};
+ if(!best.chosen.length){summary.textContent='目前消費額及錢包付款上限下，沒有可核銷的優惠券。';details.innerHTML='';return}
+ const allocations=best.payments.map(p=>({...p,amount:p.minimum}));
+ if(allocations.length)allocations[allocations.length-1].amount+=spend-best.minTotal;
+ const total=all.reduce((s,c)=>s+c.value,0),uncovered=Math.max(0,spend-best.minTotal);
+ summary.innerHTML='<div class="stats"><div class="stat"><span>能核銷券值</span><strong style="color:var(--green)">'+money(best.sum)+'</strong></div><div class="stat"><span>能核銷錢包</span><strong>'+allocations.length+' 個</strong></div><div class="stat"><span>核銷所需最低消費額</span><strong>'+money(best.minTotal)+'</strong></div><div class="stat"><span>未能涵蓋消費額</span><strong>'+money(uncovered)+'</strong></div></div><div class="result"><h3>建議付款分配</h3><p>消費總額為 '+money(spend)+'。優惠券抵扣 '+money(best.sum)+'，消費者實際支出為 '+money(spend-best.sum)+'。核銷所需最低消費額是各錢包所用優惠券面額合計的 3 倍。</p><p><strong>整體金額：</strong>消費總額 '+money(spend)+'　｜　優惠券抵扣 '+money(best.sum)+'　｜　消費者實際支出 '+money(spend-best.sum)+'</p>'+allocations.map((p,i)=>'<div class="payrow"><span class="pill">消費分配 '+(i+1)+'</span>　<strong>'+escapeHtml(p.walletName)+'</strong> 消費金額 <strong>'+money(p.amount)+'</strong><br><span class="muted">使用優惠券：'+p.coupons.map(c=>money(c.value)).join('、')+'（共 '+money(p.coupons.reduce((s,c)=>s+c.value,0))+'） · 消費者實際支出 '+money(p.amount-p.coupons.reduce((s,c)=>s+c.value,0))+' · 核銷最低消費額 '+money(p.minimum)+'</span></div>').join('')+'<p><strong>未使用券值：'+money(total-best.sum)+'；消費分配合計：'+money(allocations.reduce((s,p)=>s+p.amount,0))+'。</strong></p></div>';
+ details.innerHTML='';
 }
-const candidates=[...dp.values()].filter(s=>s.count>0);
-candidates.sort((a,b)=>mode==='use'?(b.sumCents-a.sumCents)||(a.count-b.count):(a.count-b.count)||(b.sumCents-a.sumCents));
-const selected=candidates[0]||{count:0,sumCents:0,choices:[]};
-const chosen=selected.choices.flatMap(x=>x.coupons);
-const sum=selected.sumCents/100;
-const payments=selected.choices.map(x=>({wallet:x.wallet,coupons:x.coupons,minimum:x.coupons.reduce((s,c)=>s+c.value,0)*3}));
-const minTotal=payments.reduce((s,p)=>s+p.minimum,0);
-const best={chosen,sum,wallets:payments.map(p=>p.wallet),payments,minTotal};
-
-if(!best){summary.textContent="在目前條件下找不到可行組合。請檢查消費金額、最低付款額及錢包數限制。";details.innerHTML="";return}
-const allocations=best.payments.map(p=>({...p,amount:p.minimum}));if(allocations.length)allocations[allocations.length-1].amount+=spend-best.minTotal;const total=all.reduce((s,c)=>s+c.value,0);
-const uncovered=Math.max(0,spend-best.minTotal);summary.innerHTML='<div class="stats"><div class="stat"><span>能核銷券值</span><strong style="color:var(--green)">'+money(best.sum)+'</strong></div><div class="stat"><span>能核銷錢包</span><strong>'+allocations.length+' 個</strong></div><div class="stat"><span>核銷所需最低消費額</span><strong>'+money(best.minTotal)+'</strong></div><div class="stat"><span>未能涵蓋消費額</span><strong>'+money(uncovered)+'</strong></div></div><div class="result"><h3>建議付款分配</h3><p>消費總額為 '+money(spend)+'。優惠券抵扣 '+money(best.sum)+'，消費者實際支出為 '+money(spend-best.sum)+'。核銷所需最低消費額是各錢包所用優惠券面額合計的 3 倍；同一錢包可在符合條件時一次使用多張券。</p><p><strong>整體金額：</strong>消費總額 '+money(spend)+'　｜　優惠券抵扣 '+money(best.sum)+'　｜　消費者實際支出 '+money(spend-best.sum)+'</p>'+allocations.map((p,i)=>'<div class="payrow"><span class="pill">消費分配 '+(i+1)+'</span>　<strong>錢包 '+p.wallet+'</strong> 消費金額 <strong>'+money(p.amount)+'</strong><br><span class="muted">使用優惠券：'+p.coupons.map(c=>money(c.value)).join("、")+'（共 '+money(p.coupons.reduce((s,c)=>s+c.value,0))+'） · 消費者實際支出 '+money(p.amount-p.coupons.reduce((s,c)=>s+c.value,0))+' · 核銷最低消費額 '+money(p.minimum)+'</span></div>').join("")+'<p><strong>總核銷：'+money(best.sum)+'；未使用券值：'+money(total-best.sum)+'；消費分配合計：'+money(allocations.reduce((s,p)=>s+p.amount,0))+'。</strong></p></div>';details.innerHTML=""}
-document.getElementById("calculate").addEventListener("click",calculate);document.getElementById("refresh").addEventListener("click",()=>{if(refreshWallets())calculate()});refreshWallets();calculate();
+document.getElementById('calculate').addEventListener('click',calculate);
+document.getElementById('refresh').addEventListener('click',()=>{if(refreshWallets())calculate()});
+document.getElementById('reloadCloud').addEventListener('click',()=>loadCloudData().catch(e=>showStatus(e.message,true)));
+document.getElementById('loginCloud').addEventListener('click',()=>authIn().catch(e=>showStatus(e.message,true)));
+document.getElementById('logoutCloud').addEventListener('click',()=>db.auth.signOut().then(()=>showStatus('已登出。')).catch(e=>showStatus(e.message,true)));
+initAuth().catch(e=>showStatus(e.message,true));
 </script></body></html>
