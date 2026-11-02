@@ -18,8 +18,44 @@ function parse(id){const raw=document.getElementById(id).value.trim();if(!raw)re
 function getCoupons(){return Object.keys(defaults).flatMap(parse)}
 function money(n){return "MOP "+Number(n).toLocaleString("en-US",{maximumFractionDigits:2})}
 function refreshWallets(){let error=[];const data=getCoupons();document.getElementById("wallets").innerHTML=Object.keys(defaults).map(id=>{const cs=data.filter(c=>c.wallet===id.toUpperCase());if(cs.length>3)error.push(labels[id]+"超過 3 張券");return '<div class="wallet"><strong>'+labels[id]+'</strong><div class="chips">'+(cs.length?cs.map(c=>'<span class="chip '+(c.value<50?'blue':'')+'">'+c.value+'</span>').join(""):'<span class="muted">暫無優惠券</span>')+'</div><p class="muted">共 '+cs.length+' 張 · '+money(cs.reduce((s,c)=>s+c.value,0))+'</p></div>'}).join("");document.getElementById("inputError").textContent=error.join("；");return !error.length}
-function calculate(){const spend=Number(document.getElementById("spend").value)||0,maxWallets=Number(document.getElementById("maxTx").value),mode=document.getElementById("mode").value,all=getCoupons(),summary=document.getElementById("summary"),details=document.getElementById("details");if(!refreshWallets()){summary.textContent="請先修正每個錢包最多 3 張券的限制。";details.innerHTML="";return}if(spend<=0){summary.textContent="請輸入大於 0 的消費金額。";details.innerHTML="";return}if(all.length>22){summary.textContent="示範版最多處理 22 張券，請先減少券數再試。";details.innerHTML="";return}
-let best=null;const n=all.length;for(let mask=0;mask<(1<<n);mask++){const chosen=[];for(let i=0;i<n;i++)if(mask&(1<<i))chosen.push(all[i]);const sum=chosen.reduce((s,c)=>s+c.value,0),groups={};chosen.forEach(c=>(groups[c.wallet]??=[]).push(c));const wallets=Object.keys(groups);if(wallets.length>maxWallets)continue;const payments=wallets.map(w=>({wallet:w,coupons:groups[w],minimum:groups[w].reduce((sum,c)=>sum+c.value,0)*3}));const minTotal=payments.reduce((s,p)=>s+p.minimum,0);if(minTotal>spend)continue;const score=mode==="use"?sum*1000-wallets.length:-wallets.length*100000+sum;if(!best||score>best.score)best={chosen,sum,wallets,payments,minTotal,score}}
+function calculate(){const spend=Number(document.getElementById("spend").value)||0,maxWallets=Number(document.getElementById("maxTx").value),mode=document.getElementById("mode").value,all=getCoupons(),summary=document.getElementById("summary"),details=document.getElementById("details");if(!refreshWallets()){summary.textContent="請先修正每個錢包最多 3 張券的限制。";details.innerHTML="";return}if(spend<=0){summary.textContent="請輸入大於 0 的消費金額。";details.innerHTML="";return}
+// 按錢包分組做多重選擇背包 DP：每個錢包最多 3 張券，最多只有 8 種選法（含不使用）。
+// 核銷最低消費額 = 券值總和 × 3，因此只需按總券值及使用錢包數保留最佳狀態。
+const walletIds=Object.keys(defaults);
+const limitCents=Math.floor((spend/3)*100+1e-8);
+const walletsData=walletIds.map(id=>({id:id.toUpperCase(),coupons:all.filter(c=>c.wallet===id.toUpperCase())}));
+let dp=new Map([['0|0',{count:0,sumCents:0,choices:[]} ]]);
+for(const wallet of walletsData){
+  const options=[{sumCents:0,coupons:[]}];
+  const m=wallet.coupons.length;
+  for(let mask=1;mask<(1<<m);mask++){
+    const picked=wallet.coupons.filter((_,i)=>mask&(1<<i));
+    const sumCents=picked.reduce((s,x)=>s+Math.round(x.value*100),0);
+    if(sumCents<=limitCents)options.push({sumCents,coupons:picked});
+  }
+  const next=new Map(dp);
+  for(const state of dp.values()){
+    for(const option of options){
+      if(!option.coupons.length)continue;
+      const count=state.count+1;
+      if(count>maxWallets)continue;
+      const sumCents=state.sumCents+option.sumCents;
+      if(sumCents>limitCents)continue;
+      const key=count+'|'+sumCents;
+      if(!next.has(key))next.set(key,{count,sumCents,choices:[...state.choices,{wallet:wallet.id,coupons:option.coupons}]});
+    }
+  }
+  dp=next;
+}
+const candidates=[...dp.values()].filter(s=>s.count>0);
+candidates.sort((a,b)=>mode==='use'?(b.sumCents-a.sumCents)||(a.count-b.count):(a.count-b.count)||(b.sumCents-a.sumCents));
+const selected=candidates[0]||{count:0,sumCents:0,choices:[]};
+const chosen=selected.choices.flatMap(x=>x.coupons);
+const sum=selected.sumCents/100;
+const payments=selected.choices.map(x=>({wallet:x.wallet,coupons:x.coupons,minimum:x.coupons.reduce((s,c)=>s+c.value,0)*3}));
+const minTotal=payments.reduce((s,p)=>s+p.minimum,0);
+const best={chosen,sum,wallets:payments.map(p=>p.wallet),payments,minTotal};
+
 if(!best){summary.textContent="在目前條件下找不到可行組合。請檢查消費金額、最低付款額及錢包數限制。";details.innerHTML="";return}
 const allocations=best.payments.map(p=>({...p,amount:p.minimum}));if(allocations.length)allocations[allocations.length-1].amount+=spend-best.minTotal;const total=all.reduce((s,c)=>s+c.value,0);
 const uncovered=Math.max(0,spend-best.minTotal);summary.innerHTML='<div class="stats"><div class="stat"><span>能核銷券值</span><strong style="color:var(--green)">'+money(best.sum)+'</strong></div><div class="stat"><span>能核銷錢包</span><strong>'+allocations.length+' 個</strong></div><div class="stat"><span>核銷所需最低消費額</span><strong>'+money(best.minTotal)+'</strong></div><div class="stat"><span>未能涵蓋消費額</span><strong>'+money(uncovered)+'</strong></div></div><div class="result"><h3>建議付款分配</h3><p>消費總額為 '+money(spend)+'。優惠券抵扣 '+money(best.sum)+'，消費者實際支出為 '+money(spend-best.sum)+'。核銷所需最低消費額是各錢包所用優惠券面額合計的 3 倍；同一錢包可在符合條件時一次使用多張券。</p><p><strong>整體金額：</strong>消費總額 '+money(spend)+'　｜　優惠券抵扣 '+money(best.sum)+'　｜　消費者實際支出 '+money(spend-best.sum)+'</p>'+allocations.map((p,i)=>'<div class="payrow"><span class="pill">消費分配 '+(i+1)+'</span>　<strong>錢包 '+p.wallet+'</strong> 消費金額 <strong>'+money(p.amount)+'</strong><br><span class="muted">使用優惠券：'+p.coupons.map(c=>money(c.value)).join("、")+'（共 '+money(p.coupons.reduce((s,c)=>s+c.value,0))+'） · 消費者實際支出 '+money(p.amount-p.coupons.reduce((s,c)=>s+c.value,0))+' · 核銷最低消費額 '+money(p.minimum)+'</span></div>').join("")+'<p><strong>總核銷：'+money(best.sum)+'；未使用券值：'+money(total-best.sum)+'；消費分配合計：'+money(allocations.reduce((s,p)=>s+p.amount,0))+'。</strong></p></div>';details.innerHTML=""}
