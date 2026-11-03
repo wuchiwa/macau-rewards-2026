@@ -32,7 +32,9 @@
  </details>
 </section>
 </main><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/common.js?v=1"></script>
 <script>
+const { money, expiryDate, escapeHtml } = window.RewardsCommon;
 const SUPABASE_URL='https://wokoioenlqtsmhyobxko.supabase.co';
 const SUPABASE_KEY='sb_publishable_Ds1oRszcoozkgZju6o1L9w_HP60YnpO';
 const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
@@ -41,8 +43,8 @@ const inputs=document.getElementById('inputs');
 const walletBox=document.getElementById('wallets');
 const authBox=document.getElementById('cloudAuth');
 const statusBox=document.getElementById('cloudStatus');
-function money(n){return 'MOP '+Number(n).toLocaleString('en-US',{maximumFractionDigits:2})}
-function expiryDate(claim){const d=new Date(String(claim.claimed_on)+'T12:00:00');const days=(4-d.getDay()+7)%7;d.setDate(d.getDate()+days);return d.toISOString().slice(0,10)}
+
+
 function todayLocal(){const d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10)}
 function showStatus(msg,error=false){statusBox.textContent=msg;statusBox.style.color=error?'#b42318':'#16845b'}
 function walletLabel(w){const name=String(w.name||'');const owner=String(w.owner_name||'');return escapeHtml(name)+(owner&&owner!=='自己'&&!name.includes(owner)?' · '+escapeHtml(owner):'')}
@@ -64,7 +66,7 @@ function renderWallets(){
  max.value=String(Math.min(old,Math.max(1,active.length)));
  document.getElementById('walletCountHint').textContent=active.length+' 個錢包 · '+couponRows.length+' 張可用券';
 }
-function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
+
 function readCoupons(){
  const out=[];
  for(const w of walletRows.filter(x=>!x.is_archived)){
