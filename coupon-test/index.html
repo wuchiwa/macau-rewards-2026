@@ -17,7 +17,6 @@
  <div class="fields">
   <div><label for="spend">消費金額（MOP）</label><input id="spend" type="number" min="1" step="1" placeholder="輸入消費金額"></div>
   <div><label for="maxTx">最多使用錢包數</label><select id="maxTx"><option value="1">1 個</option><option value="2">2 個</option><option value="3" selected>3 個</option><option value="4">4 個</option><option value="8">不限（最多 8 個）</option></select></div>
-  <div style="grid-column:1/-1"><label for="mode">計算策略</label><select id="mode"><option value="use" selected>最高核銷券值</option><option value="few">最少付款錢包</option></select></div>
  </div>
  <button class="btn full" id="calculate">計算最佳方案</button>
 </section>
@@ -109,7 +108,7 @@ async function initAuth(){
  db.auth.onAuthStateChange((event,session)=>{currentUser=session?.user||null;if(!currentUser){walletRows=[];couponRows=[];walletBox.innerHTML='';inputs.innerHTML='';authBox.classList.remove('hidden');showStatus('已登出，請重新登入。',true)}else if(event==='SIGNED_IN'){authBox.classList.add('hidden');loadCloudData().catch(e=>showStatus(e.message,true))}});
 }
 function calculate(){
- const spend=Number(document.getElementById('spend').value)||0,maxWallets=Number(document.getElementById('maxTx').value),mode=document.getElementById('mode').value,summary=document.getElementById('summary'),details=document.getElementById('details');
+ const spend=Number(document.getElementById('spend').value)||0,maxWallets=Number(document.getElementById('maxTx').value),summary=document.getElementById('summary'),details=document.getElementById('details');
  let all;try{all=readCoupons()}catch(e){summary.textContent=e.message;details.innerHTML='';return}
  if(spend<=0){summary.textContent='請輸入大於 0 的消費金額。';details.innerHTML='';return}
  // 優惠券不可拆分：每張券只可整張使用，面額必須是整數。
@@ -137,9 +136,9 @@ function calculate(){
   dp=next;
  }
  const candidates=[...dp.values()].filter(s=>s.count>0);
- // 首要目標：完成整個錢包；其次才比較核銷金額及付款錢包數。
- candidates.sort((a,b)=>(b.completedWallets-a.completedWallets)||
-  (mode==='few'?(a.count-b.count)||(b.sumCents-a.sumCents):(b.sumCents-a.sumCents)||(a.count-b.count)));
+ // 嚴格按優先次序：最大化核銷券值 > 完成整個錢包 > 減少付款錢包。
+ candidates.sort((a,b)=>(b.sumCents-a.sumCents)||
+  (b.completedWallets-a.completedWallets)||(a.count-b.count));
  const selected=candidates[0]||{count:0,sumCents:0,completedWallets:0,choices:[]};
  const chosen=selected.choices.flatMap(x=>x.coupons),sum=selected.sumCents/100;
  const payments=selected.choices.map(x=>({wallet:x.wallet,walletName:x.walletName,coupons:x.coupons,minimum:x.coupons.reduce((s,c)=>s+c.value,0)*3}));
