@@ -34,7 +34,7 @@
 </main><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../js/common.js?v=1"></script>
 <script>
-const { money, expiryDate, escapeHtml } = window.RewardsCommon;
+const { money, expiryDate, localISO, escapeHtml } = window.RewardsCommon;
 const SUPABASE_URL='https://wokoioenlqtsmhyobxko.supabase.co';
 const SUPABASE_KEY='sb_publishable_Ds1oRszcoozkgZju6o1L9w_HP60YnpO';
 const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
@@ -45,7 +45,7 @@ const authBox=document.getElementById('cloudAuth');
 const statusBox=document.getElementById('cloudStatus');
 
 
-function todayLocal(){const d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10)}
+const todayLocal = localISO;
 function showStatus(msg,error=false){statusBox.textContent=msg;statusBox.style.color=error?'#b42318':'#16845b'}
 function walletLabel(w){const name=String(w.name||'');const owner=String(w.owner_name||'');return escapeHtml(name)+(owner&&owner!=='自己'&&!name.includes(owner)?' · '+escapeHtml(owner):'')}
 function renderWallets(){
