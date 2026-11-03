@@ -15,7 +15,7 @@
 <section class="card">
  <div class="cardhead"><h2>消費及付款設定</h2></div>
  <div class="fields">
-  <div><label for="spend">消費金額（MOP）</label><input id="spend" type="number" min="1" value="260" step="0.01"></div>
+  <div><label for="spend">消費金額（MOP）</label><input id="spend" type="number" min="1" step="1" placeholder="輸入消費金額"></div>
   <div><label for="maxTx">最多使用錢包數</label><select id="maxTx"><option value="1">1 個</option><option value="2">2 個</option><option value="3" selected>3 個</option><option value="4">4 個</option><option value="8">不限（最多 8 個）</option></select></div>
   <div style="grid-column:1/-1"><label for="mode">計算策略</label><select id="mode"><option value="use" selected>最高核銷券值</option><option value="few">最少付款錢包</option></select></div>
  </div>
@@ -148,10 +148,11 @@ function calculate(){
  const allocations=best.payments.map(p=>({...p,amount:p.minimum}));
  if(allocations.length)allocations[allocations.length-1].amount+=spend-best.minTotal;
  const uncovered=Math.max(0,spend-best.minTotal);
- summary.innerHTML='<div class="stats"><div class="stat"><span>能核銷券值</span><strong style="color:var(--green)">'+money(best.sum)+'</strong></div><div class="stat"><span>完成錢包</span><strong>'+selected.completedWallets+' 個</strong></div><div class="stat"><span>能核銷錢包</span><strong>'+allocations.length+' 個</strong></div><div class="stat"><span>核銷所需最低消費額</span><strong>'+money(best.minTotal)+'</strong></div></div><div class="result"><h3>建議付款分配</h3><p>消費總額 '+money(spend)+' · 優惠券抵扣 '+money(best.sum)+' · 消費者實際支出 '+money(spend-best.sum)+'</p>'+allocations.map((p,i)=>{const walletCoupons=all.filter(c=>c.wallet===p.wallet),usedIds=new Set(p.coupons.map(c=>c.id)),left=walletCoupons.filter(c=>!usedIds.has(c.id)).length,done=left===0;return '<div class="payrow"><div><div class="paywallet">'+escapeHtml(p.walletName)+'</div><span class="pill">第 '+(i+1)+' 個付款錢包</span></div><div class="payamount">'+money(p.amount)+'</div><div class="paymeta">使用優惠券：'+p.coupons.map(c=>money(c.value)).join('、')+'（共 '+money(p.coupons.reduce((s,c)=>s+c.value,0))+'）<br>核銷最低消費額 '+money(p.minimum)+' · 付款後實際支出 '+money(p.amount-p.coupons.reduce((s,c)=>s+c.value,0))+'<br><strong>'+(done?'✓ 此錢包所有金額券已用完':'尚有 '+left+' 張金額券未使用')+'</strong></div></div>'}).join('')+'<p><strong>分配消費合計：'+money(allocations.reduce((s,p)=>s+p.amount,0))+'。</strong></p></div>';
+ summary.innerHTML='<div class="stats"><div class="stat"><span>能核銷券值</span><strong style="color:var(--green)">'+money(best.sum)+'</strong></div><div class="stat"><span>完成錢包</span><strong>'+selected.completedWallets+' 個</strong></div><div class="stat"><span>能核銷錢包</span><strong>'+allocations.length+' 個</strong></div><div class="stat"><span>核銷所需最低消費額</span><strong>'+money(best.minTotal)+'</strong></div><div class="stat"><span>未能涵蓋消費額</span><strong>'+money(uncovered)+'</strong></div></div><div class="result"><h3>建議付款分配</h3><p>消費總額 '+money(spend)+' · 優惠券抵扣 '+money(best.sum)+' · 消費者實際支出 '+money(spend-best.sum)+'</p>'+allocations.map((p,i)=>{const walletCoupons=all.filter(c=>c.wallet===p.wallet),usedIds=new Set(p.coupons.map(c=>c.id)),left=walletCoupons.filter(c=>!usedIds.has(c.id)).length,done=left===0;return '<div class="payrow"><div><div class="paywallet">'+escapeHtml(p.walletName)+'</div><span class="pill">第 '+(i+1)+' 個付款錢包</span></div><div class="payamount">'+money(p.amount)+'</div><div class="paymeta">使用優惠券：'+p.coupons.map(c=>money(c.value)).join('、')+'（共 '+money(p.coupons.reduce((s,c)=>s+c.value,0))+'）<br>核銷最低消費額 '+money(p.minimum)+' · 付款後實際支出 '+money(p.amount-p.coupons.reduce((s,c)=>s+c.value,0))+'<br><strong>'+(done?'✓ 此錢包所有金額券已用完':'尚有 '+left+' 張金額券未使用')+'</strong></div></div>'}).join('')+'<p><strong>分配消費合計：'+money(allocations.reduce((s,p)=>s+p.amount,0))+'。</strong></p></div>';
  details.innerHTML='';
 }
 document.getElementById('calculate').addEventListener('click',calculate);
+document.getElementById('spend').addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();calculate()}});
 document.getElementById('refresh').addEventListener('click',()=>{if(refreshWallets())calculate()});
 document.getElementById('reloadCloud').addEventListener('click',()=>loadCloudData().catch(e=>showStatus(e.message,true)));
 document.getElementById('loginCloud').addEventListener('click',()=>authIn().catch(e=>showStatus(e.message,true)));
