@@ -43,7 +43,7 @@
 
 <script src="./js/common.js?v=1"></script>
 <script>
-const { money, expiryDate, escapeHtml: esc } = window.RewardsCommon;
+const { money, expiryDate, localISO, escapeHtml: esc } = window.RewardsCommon;
 let deferredInstallPrompt=null;
 window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();deferredInstallPrompt=event;const b=document.getElementById('installApp');if(b)b.textContent='＋ 安裝到桌面'});
 window.addEventListener('appinstalled',()=>{deferredInstallPrompt=null;const b=document.getElementById('installApp');if(b)b.textContent='✓ 已安裝'});
@@ -86,7 +86,6 @@ const resultChoices=[['merchant_discount','🟨','商戶滿減券'],['consumer_b
 function renderPlatformPicker(){$('platformPicker').innerHTML=platforms.map(([name,logo])=>'<button type="button" class="platform-choice '+(platformSelected===name?'active':'')+'" data-platform="'+esc(name)+'"><img src="'+logo+'" alt="" onerror="this.style.visibility=\'hidden\'"><span>'+esc(name)+'</span></button>').join('');$('newWalletName').value=platformSelected}
 function renderResultChoices(){['draw1','draw2','draw3'].forEach(id=>{let box=document.querySelector('[data-draw="'+id+'"]');if(!box)return;let val=$(id).value;box.innerHTML=resultChoices.map(([v,emoji,label])=>'<button type="button" class="result-choice '+(val===v?'active':'')+'" data-result-for="'+id+'" data-value="'+v+'"><span class="result-emoji">'+emoji+'</span><span>'+label+'</span></button>').join('')})}
 $('url').value=SUPABASE_URL;$('key').value=SUPABASE_KEY;
-function localISO(d=new Date()){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function weekStart(date=new Date()){let d=new Date(date.getFullYear(),date.getMonth(),date.getDate());d.setDate(d.getDate()-((d.getDay()+2)%7));return localISO(d)}
 function datePlus(dateStr,n){let d=new Date(dateStr+'T12:00:00');d.setDate(d.getDate()+n);return localISO(d)}
 
