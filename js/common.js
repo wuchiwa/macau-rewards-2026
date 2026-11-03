@@ -19,6 +19,12 @@
     ].join('-');
   }
 
+  function localISO(date = new Date()) {
+    return date.getFullYear() + '-' +
+      String(date.getMonth() + 1).padStart(2, '0') + '-' +
+      String(date.getDate()).padStart(2, '0');
+  }
+
   function escapeHtml(value) {
     return String(value ?? '').replace(/[&<>"']/g, character => ({
       '&': '&amp;',
@@ -29,5 +35,5 @@
     })[character]);
   }
 
-  global.RewardsCommon = Object.freeze({ money, expiryDate, escapeHtml });
+  global.RewardsCommon = Object.freeze({ money, expiryDate, localISO, escapeHtml });
 })(window);
