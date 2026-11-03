@@ -41,8 +41,9 @@
 <div class="foot">個人記錄工具 · 請以官方活動條款及錢包顯示為準<br><span style="display:inline-block;margin-top:6px">網頁網址：</span><a href="https://wuchiwa.github.io/macau-rewards-2026/" style="color:var(--blue);text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere">https://wuchiwa.github.io/macau-rewards-2026/</a></div>
 </main>
 
+<script src="./js/common.js?v=1"></script>
 <script>
-
+const { money, expiryDate, escapeHtml: esc } = window.RewardsCommon;
 let deferredInstallPrompt=null;
 window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();deferredInstallPrompt=event;const b=document.getElementById('installApp');if(b)b.textContent='＋ 安裝到桌面'});
 window.addEventListener('appinstalled',()=>{deferredInstallPrompt=null;const b=document.getElementById('installApp');if(b)b.textContent='✓ 已安裝'});
@@ -78,7 +79,7 @@ function startGuest(){guestMode=true;user=null;const x=readLocal();wallets=x.wal
 const platforms=[['MPay','https://macau-rewards-2026.web.app/icons/mpay.png'],['支付寶','https://macau-rewards-2026.web.app/icons/alipay.png'],['中銀','https://macau-rewards-2026.web.app/icons/boc.png'],['工銀','https://macau-rewards-2026.web.app/icons/icbc.png'],['豐付寶','https://macau-rewards-2026.web.app/icons/tf.png'],['廣發','https://macau-rewards-2026.web.app/icons/cgb.png'],['LusoPay','https://macau-rewards-2026.web.app/icons/luso.png'],['UePay','https://macau-rewards-2026.web.app/icons/uepay.png']];
 function platformName(w){let raw=String(w??'').trim();return platforms.find(([n])=>raw===n||raw.endsWith(' · '+n)||raw.includes(' · '+n))?.[0]||null}
 function displayPlatform(w){return platformName(w)||String(w?.name||'未知錢包')}
-function expiryDate(claim){let d=new Date(String(claim.claimed_on)+'T12:00:00');let days=(4-d.getDay()+7)%7;return datePlus(String(claim.claimed_on),days)}
+
 function isExpired(claim,now=localISO()){return claim.result_type==='coupon'&&!claim.redeemed&&expiryDate(claim)<now}
 function platformIcon(w){let p=platforms.find(([n])=>n===platformName(w));return p?p[1]:''}
 const resultChoices=[['merchant_discount','🟨','商戶滿減券'],['consumer_benefit','🟦','消費禮遇券'],['10','🎟️','MOP 10'],['20','🎟️','MOP 20'],['50','🎟️','MOP 50'],['100','🎟️','MOP 100'],['200','🎟️','MOP 200']];
@@ -88,8 +89,8 @@ $('url').value=SUPABASE_URL;$('key').value=SUPABASE_KEY;
 function localISO(d=new Date()){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function weekStart(date=new Date()){let d=new Date(date.getFullYear(),date.getMonth(),date.getDate());d.setDate(d.getDate()-((d.getDay()+2)%7));return localISO(d)}
 function datePlus(dateStr,n){let d=new Date(dateStr+'T12:00:00');d.setDate(d.getDate()+n);return localISO(d)}
-function money(n){return 'MOP '+Number(n||0).toLocaleString('en',{maximumFractionDigits:0})}
-function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+
+
 function msg(s,error=false,id='msg'){$(id).textContent=s;$(id).className='msg'+(error?' error':'')}
 function connect(){if(!window.supabase)throw Error('雲端連線程式載入失敗，請檢查網絡後重新整理。');if(!db){db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);db.auth.onAuthStateChange((event)=>{if(event==='PASSWORD_RECOVERY'){$('auth').classList.remove('hidden');$('app').classList.add('hidden');$('userbadge').classList.add('hidden');$('resetPasswordPanel').classList.remove('hidden');msg('已開啟密碼重設程序，請輸入新密碼。',false,'authmsg')}})}}
 function show(){ $('setup').classList.add('hidden');$('auth').classList.toggle('hidden',!authPanelOpen);$('app').classList.toggle('hidden',!user&&!guestMode);$('userbadge').classList.toggle('hidden',!user&&!guestMode);$('authToggle').textContent=user?'已登入 ▾':'登入';$('userbadge').textContent=user?'雲端帳戶':guestMode?'本機模式':'未登入';$('logout').textContent=user?'登出':'返回記錄';}
