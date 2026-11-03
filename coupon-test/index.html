@@ -111,9 +111,23 @@ function calculate(){
  const spend=Number(document.getElementById('spend').value)||0,maxWallets=Number(document.getElementById('maxTx').value),summary=document.getElementById('summary'),details=document.getElementById('details');
  let all;try{all=readCoupons()}catch(e){summary.textContent=e.message;details.innerHTML='';return}
  if(spend<=0){summary.textContent='請輸入大於 0 的消費金額。';details.innerHTML='';return}
- // 優惠券不可拆分：每張券只可整張使用，面額必須是整數。
+ // 每張券不可拆分；所有券的最低消費門檻均為面額的 3 倍。
  const limitCents=Math.floor((spend/3)+1e-8)*100;
  const walletGroups=walletRows.filter(w=>!w.is_archived).map(w=>({id:w.id,name:w.name,coupons:all.filter(c=>c.wallet===w.id)}));
+ const compareValues=(a,b)=>{
+  const av=a.choices.flatMap(x=>x.coupons.map(c=>Math.round(c.value*100))).sort((x,y)=>y-x);
+  const bv=b.choices.flatMap(x=>x.coupons.map(c=>Math.round(c.value*100))).sort((x,y)=>y-x);
+  for(let i=0;i<Math.min(av.length,bv.length);i++)if(av[i]!==bv[i])return bv[i]-av[i];
+  return bv.length-av.length;
+ };
+ const isBetter=(a,b)=>{
+  if(!b)return true;
+  if(a.sumCents!==b.sumCents)return a.sumCents>b.sumCents;
+  if(a.count!==b.count)return a.count<b.count;
+  const denominationOrder=compareValues(a,b);
+  if(denominationOrder!==0)return denominationOrder<0;
+  return a.completedWallets>b.completedWallets;
+ };
  let dp=new Map([['0|0',{count:0,sumCents:0,completedWallets:0,choices:[]} ]]);
  for(const wallet of walletGroups){
   const options=[{sumCents:0,coupons:[]}],m=wallet.coupons.length;
@@ -130,15 +144,13 @@ function calculate(){
    const completedWallets=state.completedWallets+(option.coupons.length===wallet.coupons.length?1:0);
    const key=count+'|'+sumCents;
    const candidate={count,sumCents,completedWallets,choices:[...state.choices,{wallet:wallet.id,walletName:wallet.name,coupons:option.coupons}]};
-   const previous=next.get(key);
-   if(!previous||candidate.completedWallets>previous.completedWallets)next.set(key,candidate);
+   if(isBetter(candidate,next.get(key)))next.set(key,candidate);
   }
   dp=next;
  }
  const candidates=[...dp.values()].filter(s=>s.count>0);
- // 嚴格按優先次序：最大化核銷券值 > 完成整個錢包 > 減少付款錢包。
- candidates.sort((a,b)=>(b.sumCents-a.sumCents)||
-  (b.completedWallets-a.completedWallets)||(a.count-b.count));
+ // 優先：最高核銷券值 > 最少付款錢包 > 優先使用較大面額券；完成錢包只作最後同分考量。
+ candidates.sort((a,b)=>(b.sumCents-a.sumCents)||(a.count-b.count)||compareValues(a,b)||(b.completedWallets-a.completedWallets));
  const selected=candidates[0]||{count:0,sumCents:0,completedWallets:0,choices:[]};
  const chosen=selected.choices.flatMap(x=>x.coupons),sum=selected.sumCents/100;
  const payments=selected.choices.map(x=>({wallet:x.wallet,walletName:x.walletName,coupons:x.coupons,minimum:x.coupons.reduce((s,c)=>s+c.value,0)*3}));
