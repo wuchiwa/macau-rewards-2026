@@ -73,7 +73,7 @@ const $=id=>document.getElementById(id);const EVENT_START='2026-10-09',EVENT_WEE
 const LOCAL_KEY='macauRewards2026_local_v1';
 function readLocal(){try{const x=JSON.parse(localStorage.getItem(LOCAL_KEY)||'{}');return {wallets:Array.isArray(x.wallets)?x.wallets:[],claims:Array.isArray(x.claims)?x.claims:[]}}catch(e){return {wallets:[],claims:[]}}}
 function writeLocal(){try{localStorage.setItem(LOCAL_KEY,JSON.stringify({wallets,claims}))}catch(e){throw Error('本機儲存失敗，請檢查手機儲存空間或瀏覽器設定。')}}
-function hasPendingLocal(){const x=readLocal();return x.wallets.some(w=>!w.syncedId)||x.claims.some(c=>!c.syncedId)}
+function hasPendingLocal(){const x=readLocal();return x.wallets.some(w=>!w.syncedId)||x.claims.some(c=>!c.syncedId&&!c.syncSkippedReason)}
 function newLocalId(prefix){return prefix+'-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,9)}
 function startGuest(){guestMode=true;user=null;const x=readLocal();wallets=x.wallets;claims=x.claims;selected=wallets.find(w=>!w.is_archived)?.id||null;show();render();msg('目前使用本機記錄模式。註冊／登入後可把未同步紀錄上傳雲端。')}
 const platforms=[['MPay','https://macau-rewards-2026.web.app/icons/mpay.png'],['支付寶','https://macau-rewards-2026.web.app/icons/alipay.png'],['中銀','https://macau-rewards-2026.web.app/icons/boc.png'],['工銀','https://macau-rewards-2026.web.app/icons/icbc.png'],['豐付寶','https://macau-rewards-2026.web.app/icons/tf.png'],['廣發','https://macau-rewards-2026.web.app/icons/cgb.png'],['LusoPay','https://macau-rewards-2026.web.app/icons/luso.png'],['UePay','https://macau-rewards-2026.web.app/icons/uepay.png']];
