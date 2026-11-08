@@ -16,7 +16,7 @@
 <section id="calculatorWorkspace" class="card workspace-panel hidden">
 <div class="section-tag">CALCULATOR · REDEMPTION PLANNER</div><h2 style="margin:5px 0 4px">優惠券核銷計算</h2>
 <p class="muted" style="margin:0 0 14px">使用目前 APP 已載入的錢包及未核銷有效面額券試算，不會另行登入或重新讀取雲端。</p>
-<div class="calc-fields"><div><label for="calcSpend">消費金額（MOP）</label><input id="calcSpend" type="number" min="1" step="1" inputmode="decimal" placeholder="輸入今次消費金額"></div><div><label for="calcMaxWallets">最多使用錢包數</label><select id="calcMaxWallets"><option value="1">1 個</option><option value="2">2 個</option><option value="3" selected>3 個</option><option value="4">4 個</option><option value="8">不限</option></select></div></div>
+<div class="calc-wallet-overview" id="calcWalletOverview"></div><div class="calc-fields"><div><label for="calcSpend">消費金額（MOP）</label><input id="calcSpend" type="number" min="1" step="1" inputmode="decimal" placeholder="輸入今次消費金額"></div><div><label for="calcMaxWallets">最多使用錢包數</label><select id="calcMaxWallets"><option value="8" selected>不限錢包數</option></select></div></div>
 <div class="muted calc-inventory-hint" id="calcInventoryHint">正在整理可用優惠券…</div><button id="calcRun" type="button" style="width:100%;margin-top:12px">計算最佳方案</button>
 <div id="calcSummary" class="calc-summary muted">輸入消費金額，按「計算最佳方案」。</div><div id="calcDetails"></div>
 <div id="calcAction" class="calc-action hidden"><button id="calcRedeem" type="button" style="width:100%">核銷這些優惠券</button><div class="muted" id="calcActionHint">確認後會使用主 APP 原有核銷流程。</div></div>
@@ -81,7 +81,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
 
 const SUPABASE_URL='https://wokoioenlqtsmhyobxko.supabase.co';
 const SUPABASE_KEY='sb_publishable_Ds1oRszcoozkgZju6o1L9w_HP60YnpO';
-const $=id=>document.getElementById(id);const EVENT_START='2026-10-09',EVENT_WEEKS=10,EVENT_END='2026-12-17';let db=null,user=null,guestMode=false,authPanelOpen=false,wallets=[],claims=[],selected=null,showAll=false,historyPeriod="current",platformSelected='MPay',showAddWalletPanel=false;let recordCollapsed=null,calcResult=null;
+const $=id=>document.getElementById(id);const EVENT_START='2026-10-09',EVENT_WEEKS=10,EVENT_END='2026-12-17';let db=null,user=null,guestMode=false,authPanelOpen=false,wallets=[],claims=[],selected=null,showAll=false,historyPeriod="current",platformSelected='MPay',showAddWalletPanel=false;let recordCollapsed=null,calcResult=null,calcInventorySignature=null;
 const LOCAL_KEY='macauRewards2026_local_v1';
 function readLocal(){try{const x=JSON.parse(localStorage.getItem(LOCAL_KEY)||'{}');return {wallets:Array.isArray(x.wallets)?x.wallets:[],claims:Array.isArray(x.claims)?x.claims:[]}}catch(e){return {wallets:[],claims:[]}}}
 function writeLocal(){try{localStorage.setItem(LOCAL_KEY,JSON.stringify({wallets,claims}))}catch(e){throw Error('本機儲存失敗，請檢查手機儲存空間或瀏覽器設定。')}}
@@ -176,13 +176,20 @@ function weeklyClaims(wid){let start=weekStart();return claims.some(c=>c.wallet_
 function activeWallets(){return wallets.filter(w=>!w.is_archived)}
 function selectedWallet(){return activeWallets().find(w=>w.id===selected)}
 
-function renderCalculatorControls(){
- const active=activeWallets(),previous=Number($('calcMaxWallets').value)||Math.min(3,active.length||1),max=Math.max(1,active.length);
- $('calcMaxWallets').innerHTML=Array.from({length:max},(_,i)=>'<option value="'+(i+1)+'">'+(i+1)+' 個錢包</option>').join('');
- $('calcMaxWallets').value=String(Math.min(previous,max));
+function getCalculatorInventory(){
+ const active=activeWallets();
  const available=window.RewardsCoupons.availableCoupons(claims).filter(c=>Number(c.coupon_value)>0&&active.some(w=>w.id===c.wallet_id));
- $('calcInventoryHint').textContent='目前有 '+active.length+' 個可用錢包 · '+available.length+' 張有效未核銷面額券 · 合計 '+money(available.reduce((s,c)=>s+Number(c.coupon_value||0),0));
- calcResult=null;$('calcSummary').textContent='輸入消費金額，按「計算最佳方案」。';$('calcDetails').innerHTML='';$('calcAction').classList.add('hidden');
+ const signature=JSON.stringify([active.map(w=>w.id).sort(),available.map(c=>[c.id,c.wallet_id,Number(c.coupon_value)]).sort((a,b)=>String(a[0]).localeCompare(String(b[0])))]);
+ return {active,available,signature};
+}
+function renderCalculatorControls(){
+ const {active,available,signature}=getCalculatorInventory(),max=Math.max(1,active.length);
+ $('calcMaxWallets').innerHTML=Array.from({length:max},(_,i)=>'<option value="'+(i+1)+'">'+(i+1)+' 個錢包</option>').join('')+'<option value="'+max+'">不限錢包數</option>';
+ $('calcMaxWallets').value=String(max);
+ $('calcInventoryHint').textContent='可用 '+active.length+' 個錢包 · '+available.length+' 張有效未核銷面額券 · 券值合計 '+money(available.reduce((s,c)=>s+Number(c.coupon_value||0),0));
+ $('calcWalletOverview').innerHTML=active.length?active.map(w=>{const own=available.filter(c=>c.wallet_id===w.id),owner=w.owner_name&&w.owner_name!=='自己'?' · '+esc(w.owner_name):'';return '<div class="calc-wallet-card"><div class="calc-wallet-title">'+esc(w.name)+owner+'</div><div class="calc-wallet-chips">'+(own.length?own.map(c=>'<span class="calc-chip '+(Number(c.coupon_value)>=50?'gold':'blue')+'">MOP '+Number(c.coupon_value)+'</span>').join(''):'<span class="calc-wallet-empty">沒有可用券</span>')+'</div><div class="calc-wallet-total">'+own.length+' 張可用 · '+money(own.reduce((s,c)=>s+Number(c.coupon_value||0),0))+'</div></div>'}).join(''):'<div class="calc-wallet-empty">目前沒有可用錢包</div>';
+ if(calcInventorySignature!==null&&calcInventorySignature!==signature){calcResult=null;$('calcSummary').textContent='優惠券或錢包資料已有變動，請重新計算。';$('calcDetails').innerHTML='';$('calcAction').classList.add('hidden')}
+ calcInventorySignature=signature;
 }
 function runIntegratedCalculator(){
  const spend=Number($('calcSpend').value)||0;
