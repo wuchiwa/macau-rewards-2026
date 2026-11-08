@@ -184,7 +184,7 @@ function getCalculatorInventory(){
 }
 function renderCalculatorControls(){
  const {active,available,signature}=getCalculatorInventory(),max=Math.max(1,active.length);
- $('calcMaxWallets').innerHTML=Array.from({length:max},(_,i)=>'<option value="'+(i+1)+'">'+(i+1)+' 個錢包</option>').join('')+'<option value="'+max+'">不限錢包數</option>';
+ $('calcMaxWallets').innerHTML=Array.from({length:Math.max(0,max-1)},(_,i)=>'<option value="'+(i+1)+'">'+(i+1)+' 個錢包</option>').join('')+'<option value="'+max+'" selected>不限錢包數</option>';
  $('calcMaxWallets').value=String(max);
  $('calcInventoryHint').textContent='可用 '+active.length+' 個錢包 · '+available.length+' 張有效未核銷面額券 · 券值合計 '+money(available.reduce((s,c)=>s+Number(c.coupon_value||0),0));
  $('calcWalletOverview').innerHTML=active.length?active.map(w=>{const own=available.filter(c=>c.wallet_id===w.id),owner=w.owner_name&&w.owner_name!=='自己'?' · '+esc(w.owner_name):'';return '<div class="calc-wallet-card"><div class="calc-wallet-title">'+esc(w.name)+owner+'</div><div class="calc-wallet-chips">'+(own.length?own.map(c=>'<span class="calc-chip '+(Number(c.coupon_value)>=50?'gold':'blue')+'">MOP '+Number(c.coupon_value)+'</span>').join(''):'<span class="calc-wallet-empty">沒有可用券</span>')+'</div><div class="calc-wallet-total">'+own.length+' 張可用 · '+money(own.reduce((s,c)=>s+Number(c.coupon_value||0),0))+'</div></div>'}).join(''):'<div class="calc-wallet-empty">目前沒有可用錢包</div>';
