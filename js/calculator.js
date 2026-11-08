@@ -1,19 +1,25 @@
 /* Shared coupon optimizer. Pure calculation: it never changes coupon records. */
 (function (global) {
-  function compareValues(a, b) {
-    const av = a.choices.flatMap(x => x.coupons.map(c => Math.round(c.value * 100))).sort((x, y) => y - x);
-    const bv = b.choices.flatMap(x => x.coupons.map(c => Math.round(c.value * 100))).sort((x, y) => y - x);
-    for (let i = 0; i < Math.min(av.length, bv.length); i++) if (av[i] !== bv[i]) return bv[i] - av[i];
-    return bv.length - av.length;
+  // 200 / 100 / 50 retain denomination priority. 20 is deliberately
+  // tied with 10, so wallet completion can decide between those options.
+  function compareLargeDenominations(a, b) {
+    const valuesA = a.choices.flatMap(x => x.coupons.map(c => Number(c.value)));
+    const valuesB = b.choices.flatMap(x => x.coupons.map(c => Number(c.value)));
+    for (const value of [200, 100, 50]) {
+      const countA = valuesA.filter(v => v === value).length;
+      const countB = valuesB.filter(v => v === value).length;
+      if (countA !== countB) return countB - countA;
+    }
+    return 0;
   }
 
   function isBetter(a, b) {
     if (!b) return true;
     if (a.sumCents !== b.sumCents) return a.sumCents > b.sumCents;
-    if (a.count !== b.count) return a.count < b.count;
-    const denominationOrder = compareValues(a, b);
+    const denominationOrder = compareLargeDenominations(a, b);
     if (denominationOrder !== 0) return denominationOrder < 0;
-    return a.completedWallets > b.completedWallets;
+    if (a.completedWallets !== b.completedWallets) return a.completedWallets > b.completedWallets;
+    return a.count < b.count;
   }
 
   function calculate({ spend, maxWallets, wallets, coupons }) {
@@ -48,8 +54,10 @@
       dp = next;
     }
     const candidates = [...dp.values()].filter(s => s.count > 0);
-    candidates.sort((a, b) => (b.sumCents - a.sumCents) || (a.count - b.count) ||
-      compareValues(a, b) || (b.completedWallets - a.completedWallets));
+    candidates.sort((a, b) => (b.sumCents - a.sumCents) ||
+      compareLargeDenominations(a, b) ||
+      (b.completedWallets - a.completedWallets) ||
+      (a.count - b.count));
     const selected = candidates[0] || { count: 0, sumCents: 0, completedWallets: 0, choices: [] };
     const chosen = selected.choices.flatMap(x => x.coupons);
     const sum = selected.sumCents / 100;
