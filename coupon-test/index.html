@@ -32,8 +32,10 @@
 </section>
 </main><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../js/common.js?v=1"></script>
+<script src="../js/wallet-data.js?v=1"></script>
 <script>
 const { money, expiryDate, localISO, escapeHtml } = window.RewardsCommon;
+const { displayPlatform } = window.RewardsWallets;
 const SUPABASE_URL='https://wokoioenlqtsmhyobxko.supabase.co';
 const SUPABASE_KEY='sb_publishable_Ds1oRszcoozkgZju6o1L9w_HP60YnpO';
 const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
@@ -46,7 +48,7 @@ const statusBox=document.getElementById('cloudStatus');
 
 const todayLocal = localISO;
 function showStatus(msg,error=false){statusBox.textContent=msg;statusBox.style.color=error?'#b42318':'#16845b'}
-function walletLabel(w){const name=String(w.name||'');const owner=String(w.owner_name||'');return escapeHtml(name)+(owner&&owner!=='自己'&&!name.includes(owner)?' · '+escapeHtml(owner):'')}
+function walletLabel(w){const name=String(w.name||'');const owner=String(w.owner_name||'');return escapeHtml(displayPlatform(w))+(owner&&owner!=='自己'&&!name.includes(owner)?' · '+escapeHtml(owner):'')}
 function renderWallets(){
  const active=walletRows.filter(w=>!w.is_archived);
  walletBox.innerHTML=active.map(w=>{
