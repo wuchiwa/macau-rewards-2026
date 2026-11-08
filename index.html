@@ -41,8 +41,10 @@
 </main>
 
 <script src="./js/common.js?v=1"></script>
+<script src="./js/wallet-data.js?v=1"></script>
 <script>
 const { money, expiryDate, localISO, escapeHtml: esc } = window.RewardsCommon;
+const { platforms, platformName, displayPlatform, platformIcon } = window.RewardsWallets;
 let deferredInstallPrompt=null;
 window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();deferredInstallPrompt=event;const b=document.getElementById('installApp');if(b)b.textContent='＋ 安裝到桌面'});
 window.addEventListener('appinstalled',()=>{deferredInstallPrompt=null;const b=document.getElementById('installApp');if(b)b.textContent='✓ 已安裝'});
@@ -75,12 +77,8 @@ function writeLocal(){try{localStorage.setItem(LOCAL_KEY,JSON.stringify({wallets
 function hasPendingLocal(){const x=readLocal();return x.wallets.some(w=>!w.syncedId)||x.claims.some(c=>!c.syncedId&&!c.syncSkippedReason)}
 function newLocalId(prefix){return prefix+'-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,9)}
 function startGuest(){guestMode=true;user=null;const x=readLocal();wallets=x.wallets;claims=x.claims;selected=wallets.find(w=>!w.is_archived)?.id||null;show();render();msg('目前使用本機記錄模式。註冊／登入後可把未同步紀錄上傳雲端。')}
-const platforms=[['MPay','https://macau-rewards-2026.web.app/icons/mpay.png'],['支付寶','https://macau-rewards-2026.web.app/icons/alipay.png'],['中銀','https://macau-rewards-2026.web.app/icons/boc.png'],['工銀','https://macau-rewards-2026.web.app/icons/icbc.png'],['豐付寶','https://macau-rewards-2026.web.app/icons/tf.png'],['廣發','https://macau-rewards-2026.web.app/icons/cgb.png'],['LusoPay','https://macau-rewards-2026.web.app/icons/luso.png'],['UePay','https://macau-rewards-2026.web.app/icons/uepay.png']];
-function platformName(w){let raw=String(w??'').trim();return platforms.find(([n])=>raw===n||raw.endsWith(' · '+n)||raw.includes(' · '+n))?.[0]||null}
-function displayPlatform(w){return platformName(w)||String(w?.name||'未知錢包')}
 
 function isExpired(claim,now=localISO()){return claim.result_type==='coupon'&&!claim.redeemed&&expiryDate(claim)<now}
-function platformIcon(w){let p=platforms.find(([n])=>n===platformName(w));return p?p[1]:''}
 const resultChoices=[['merchant_discount','🟨','商戶滿減券'],['consumer_benefit','🟦','消費禮遇券'],['10','🎟️','MOP 10'],['20','🎟️','MOP 20'],['50','🎟️','MOP 50'],['100','🎟️','MOP 100'],['200','🎟️','MOP 200']];
 function renderPlatformPicker(){$('platformPicker').innerHTML=platforms.map(([name,logo])=>'<button type="button" class="platform-choice '+(platformSelected===name?'active':'')+'" data-platform="'+esc(name)+'"><img src="'+logo+'" alt="" onerror="this.style.visibility=\'hidden\'"><span>'+esc(name)+'</span></button>').join('');$('newWalletName').value=platformSelected}
 function renderResultChoices(){['draw1','draw2','draw3'].forEach(id=>{let box=document.querySelector('[data-draw="'+id+'"]');if(!box)return;let val=$(id).value;box.innerHTML=resultChoices.map(([v,emoji,label])=>'<button type="button" class="result-choice '+(val===v?'active':'')+'" data-result-for="'+id+'" data-value="'+v+'"><span class="result-emoji">'+emoji+'</span><span>'+label+'</span></button>').join('')})}
