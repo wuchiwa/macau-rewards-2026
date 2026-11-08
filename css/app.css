@@ -1854,3 +1854,28 @@ button:disabled {
   margin:0;
   border-radius:0
 }
+
+
+/* ===== Integrated redemption calculator workspace ===== */
+.workspace-switch{display:flex;gap:8px;padding:5px;margin:0 0 14px;border:1px solid #e3eaf2;border-radius:14px;background:#f4f7fb}
+.workspace-switch button{flex:1;min-height:42px;border:0;border-radius:10px;background:transparent;color:#617287;font-weight:750;box-shadow:none}
+.workspace-switch button.active{background:#fff;color:#245b9e;box-shadow:0 2px 8px #1c385015}
+.calc-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.calc-fields label{display:block;margin-bottom:6px;color:var(--muted);font-size:12px;font-weight:650}
+.calc-fields input,.calc-fields select{width:100%;min-height:43px;box-sizing:border-box}
+.calc-inventory-hint{margin-top:10px;font-size:11px}
+.calc-summary{margin-top:16px}
+.calc-summary .calc-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.calc-summary .calc-stat{min-width:0;padding:11px;border:1px solid #e5ebf2;border-radius:12px;background:#f8fafc}
+.calc-summary .calc-stat span{display:block;color:#78889a;font-size:10px;line-height:1.4}
+.calc-summary .calc-stat strong{display:block;margin-top:5px;color:#263c53;font-size:18px;overflow-wrap:anywhere}
+.calc-summary .calc-stat.primary strong{color:#21845d}
+.calc-payment-list{display:flex;flex-direction:column;gap:8px}
+.calc-payment{padding:12px;border:1px solid #e5ebf2;border-radius:12px;background:#fff}
+.calc-payment-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.calc-payment-head strong{font-size:13px;color:#2e4359}
+.calc-payment-head b{color:#1f6e50;font-size:16px}
+.calc-payment-meta{margin-top:6px;color:#748397;font-size:11px;line-height:1.6}
+.calc-action{margin-top:14px;padding-top:12px;border-top:1px solid #e8edf3}
+.calc-action .muted{margin-top:7px;font-size:10px;text-align:center}
+@media(max-width:520px){.workspace-switch{gap:5px;margin-bottom:10px}.workspace-switch button{min-height:39px;padding:8px 6px;font-size:12px}.calc-fields{gap:8px}.calc-summary .calc-stat{padding:9px}.calc-summary .calc-stat strong{font-size:16px}.calc-payment{padding:10px}}
