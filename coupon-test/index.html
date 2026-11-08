@@ -33,6 +33,8 @@
 </main><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../js/common.js?v=1"></script>
 <script src="../js/wallet-data.js?v=1"></script>
+<script src="../js/coupon-data.js?v=1"></script>
+<script src="../js/calculator.js?v=1"></script>
 <script>
 const { money, expiryDate, localISO, escapeHtml } = window.RewardsCommon;
 const { displayPlatform } = window.RewardsWallets;
@@ -91,7 +93,7 @@ async function loadCloudData(){
  if(w.error)throw w.error;if(c.error)throw c.error;
  walletRows=w.data||[];
  const today=todayLocal();
- couponRows=(c.data||[]).filter(x=>Number(x.coupon_value)>0&&expiryDate(x)>=today&&walletRows.some(w=>w.id===x.wallet_id&&!w.is_archived));
+ couponRows=window.RewardsCoupons.availableCoupons(c.data||[],today).filter(x=>walletRows.some(w=>w.id===x.wallet_id&&!w.is_archived));
  renderWallets();
  showStatus('已同步 · '+walletRows.filter(w=>!w.is_archived).length+' 個錢包 · '+couponRows.length+' 張可用券');
  calculate();
@@ -112,56 +114,10 @@ async function initAuth(){
 function calculate(){
  const spend=Number(document.getElementById('spend').value)||0,maxWallets=Number(document.getElementById('maxTx').value),summary=document.getElementById('summary'),details=document.getElementById('details');
  let all;try{all=readCoupons()}catch(e){summary.textContent=e.message;details.innerHTML='';return}
- if(spend<=0){summary.textContent='請輸入大於 0 的消費金額。';details.innerHTML='';return}
- // 每張券不可拆分；所有券的最低消費門檻均為面額的 3 倍。
- const limitCents=Math.floor((spend/3)+1e-8)*100;
- const walletGroups=walletRows.filter(w=>!w.is_archived).map(w=>({id:w.id,name:w.name,coupons:all.filter(c=>c.wallet===w.id)}));
- const compareValues=(a,b)=>{
-  const av=a.choices.flatMap(x=>x.coupons.map(c=>Math.round(c.value*100))).sort((x,y)=>y-x);
-  const bv=b.choices.flatMap(x=>x.coupons.map(c=>Math.round(c.value*100))).sort((x,y)=>y-x);
-  for(let i=0;i<Math.min(av.length,bv.length);i++)if(av[i]!==bv[i])return bv[i]-av[i];
-  return bv.length-av.length;
- };
- const isBetter=(a,b)=>{
-  if(!b)return true;
-  if(a.sumCents!==b.sumCents)return a.sumCents>b.sumCents;
-  if(a.count!==b.count)return a.count<b.count;
-  const denominationOrder=compareValues(a,b);
-  if(denominationOrder!==0)return denominationOrder<0;
-  return a.completedWallets>b.completedWallets;
- };
- let dp=new Map([['0|0',{count:0,sumCents:0,completedWallets:0,choices:[]} ]]);
- for(const wallet of walletGroups){
-  const options=[{sumCents:0,coupons:[]}],m=wallet.coupons.length;
-  for(let mask=1;mask<(1<<m);mask++){
-   const picked=wallet.coupons.filter((_,i)=>mask&(1<<i));
-   const sumCents=picked.reduce((s,x)=>s+Math.round(x.value*100),0);
-   if(sumCents<=limitCents)options.push({sumCents,coupons:picked});
-  }
-  const next=new Map(dp);
-  for(const state of dp.values())for(const option of options){
-   if(!option.coupons.length)continue;
-   const count=state.count+1;if(count>maxWallets)continue;
-   const sumCents=state.sumCents+option.sumCents;if(sumCents>limitCents)continue;
-   const completedWallets=state.completedWallets+(option.coupons.length===wallet.coupons.length?1:0);
-   const key=count+'|'+sumCents;
-   const candidate={count,sumCents,completedWallets,choices:[...state.choices,{wallet:wallet.id,walletName:wallet.name,coupons:option.coupons}]};
-   if(isBetter(candidate,next.get(key)))next.set(key,candidate);
-  }
-  dp=next;
- }
- const candidates=[...dp.values()].filter(s=>s.count>0);
- // 優先：最高核銷券值 > 最少付款錢包 > 優先使用較大面額券；完成錢包只作最後同分考量。
- candidates.sort((a,b)=>(b.sumCents-a.sumCents)||(a.count-b.count)||compareValues(a,b)||(b.completedWallets-a.completedWallets));
- const selected=candidates[0]||{count:0,sumCents:0,completedWallets:0,choices:[]};
- const chosen=selected.choices.flatMap(x=>x.coupons),sum=selected.sumCents/100;
- const payments=selected.choices.map(x=>({wallet:x.wallet,walletName:x.walletName,coupons:x.coupons,minimum:x.coupons.reduce((s,c)=>s+c.value,0)*3}));
- const minTotal=payments.reduce((s,p)=>s+p.minimum,0),best={chosen,sum,payments,minTotal};
- if(!best.chosen.length){summary.textContent='目前消費額及錢包付款上限下，沒有可核銷的優惠券。';details.innerHTML='';return}
- const allocations=best.payments.map(p=>({...p,amount:p.minimum}));
- if(allocations.length)allocations[allocations.length-1].amount+=spend-best.minTotal;
- const uncovered=Math.max(0,spend-best.minTotal);
- summary.innerHTML='<div class="stats"><div class="stat"><span>能核銷券值</span><strong style="color:var(--green)">'+money(best.sum)+'</strong></div><div class="stat"><span>完成／能核銷錢包</span><strong>'+selected.completedWallets+' 個／'+allocations.length+' 個</strong></div><div class="stat"><span>核銷所需最低消費額</span><strong>'+money(best.minTotal)+'</strong></div><div class="stat"><span>未能涵蓋消費額</span><strong>'+money(uncovered)+'</strong></div></div><div class="result"><h3>建議付款分配</h3><p>消費總額 '+money(spend)+' · 優惠券抵扣 '+money(best.sum)+' · 消費者實際支出 '+money(spend-best.sum)+'</p>'+allocations.map((p,i)=>{const walletCoupons=all.filter(c=>c.wallet===p.wallet),usedIds=new Set(p.coupons.map(c=>c.id)),left=walletCoupons.filter(c=>!usedIds.has(c.id)).length,done=left===0;return '<div class="payrow"><div><div class="paywallet">'+escapeHtml(p.walletName)+'</div><span class="pill">第 '+(i+1)+' 個付款錢包</span></div><div class="payamount">'+money(p.amount)+'</div><div class="paymeta">使用優惠券：'+p.coupons.map(c=>money(c.value)).join('、')+'（共 '+money(p.coupons.reduce((s,c)=>s+c.value,0))+'）<br>核銷最低消費額 '+money(p.minimum)+' · 付款後實際支出 '+money(p.amount-p.coupons.reduce((s,c)=>s+c.value,0))+'<br><strong>'+(done?'✓ 此錢包所有金額券已用完':'尚有 '+left+' 張金額券未使用')+'</strong></div></div>'}).join('')+'<p><strong>分配消費合計：'+money(allocations.reduce((s,p)=>s+p.amount,0))+'。</strong></p></div>';
+ let result;try{result=window.RewardsCalculator.calculate({spend,maxWallets,wallets:walletRows,coupons:all})}catch(e){summary.textContent=e.message;details.innerHTML='';return}
+ if(!result.chosen.length){summary.textContent='目前消費額及錢包付款上限下，沒有可核銷的優惠券。';details.innerHTML='';return}
+ const {selected,chosen,sum,minTotal,allocations,uncovered}=result;
+ summary.innerHTML='<div class="stats"><div class="stat"><span>能核銷券值</span><strong style="color:var(--green)">'+money(sum)+'</strong></div><div class="stat"><span>完成／能核銷錢包</span><strong>'+selected.completedWallets+' 個／'+allocations.length+' 個</strong></div><div class="stat"><span>核銷所需最低消費額</span><strong>'+money(minTotal)+'</strong></div><div class="stat"><span>未能涵蓋消費額</span><strong>'+money(uncovered)+'</strong></div></div><div class="result"><h3>建議付款分配</h3><p>消費總額 '+money(spend)+' · 優惠券抵扣 '+money(sum)+' · 消費者實際支出 '+money(spend-sum)+'</p>'+allocations.map((p,i)=>{const walletCoupons=all.filter(c=>c.wallet===p.wallet),usedIds=new Set(p.coupons.map(c=>c.id)),left=walletCoupons.filter(c=>!usedIds.has(c.id)).length,done=left===0;return '<div class="payrow"><div><div class="paywallet">'+escapeHtml(p.walletName)+'</div><span class="pill">第 '+(i+1)+' 個付款錢包</span></div><div class="payamount">'+money(p.amount)+'</div><div class="paymeta">使用優惠券：'+p.coupons.map(c=>money(c.value)).join('、')+'（共 '+money(p.coupons.reduce((s,c)=>s+c.value,0))+'）<br>核銷最低消費額 '+money(p.minimum)+' · 付款後實際支出 '+money(p.amount-p.coupons.reduce((s,c)=>s+c.value,0))+'<br><strong>'+(done?'✓ 此錢包所有金額券已用完':'尚有 '+left+' 張金額券未使用')+'</strong></div></div>'}).join('')+'<p><strong>分配消費合計：'+money(allocations.reduce((s,p)=>s+p.amount,0))+'。</strong></p></div>';
  details.innerHTML='';
 }
 document.getElementById('calculate').addEventListener('click',calculate);
