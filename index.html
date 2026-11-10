@@ -213,14 +213,14 @@ async function redeemCalculatedCoupons(){
  if(user&&selectedClaims.some(c=>c.syncSkippedReason))throw Error('部分本機紀錄尚未同步到雲端，暫不能透過雲端核銷；請先處理同步狀態。');
  const total=selectedClaims.reduce((s,c)=>s+Number(c.coupon_value||0),0);
  if(!confirm('確認核銷計算方案中的優惠券？\n數量：'+ids.length+' 張\n面額合計：'+money(total)+'\n核銷後不能直接撤回，請確認付款已完成。'))return;
- if(guestMode&&!user){selectedClaims.forEach(c=>c.redeemed=true);writeLocal()}
+ if(guestMode&&!user){selectedClaims.forEach(c=>c.redeemed=true);writeLocal();calcResultRedeemed=true}
  else{
   if(!user||!db)throw Error('尚未取得有效登入狀態，請重新登入後再試。');
   const r=await db.from('reward_claims').update({redeemed:true}).in('id',ids).select('id');if(r.error)throw r.error;
   if((r.data||[]).length!==ids.length)throw Error('雲端只更新了部分優惠券；請重新載入檢查記錄，暫不視為核銷成功。');
+  calcResultRedeemed=true;
   const loaded=await load();if(!loaded)throw Error('核銷已送出，但重新載入雲端資料失敗；請重新整理確認狀態。');
  }
- calcResultRedeemed=true;
  ids.forEach(id=>{const claim=claims.find(c=>String(c.id)===id);if(claim)claim.redeemed=true;const chip=[...$('calcDetails').querySelectorAll('[data-calc-coupon-id]')].find(el=>el.dataset.calcCouponId===id);if(chip&&!chip.textContent.includes('已核銷'))chip.textContent+='（已核銷）'});
  $('calcRedeem').disabled=true;$('calcRedeem').textContent='✓ 已核銷完成';$('calcActionHint').textContent='本方案 '+ids.length+' 張優惠券已核銷；上方付款分配及券面額資料已保留供查閱。';
  render();msg('已核銷 '+ids.length+' 張，合計 '+money(total)+'。');
