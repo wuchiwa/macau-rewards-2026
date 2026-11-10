@@ -81,7 +81,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
 
 const SUPABASE_URL='https://wokoioenlqtsmhyobxko.supabase.co';
 const SUPABASE_KEY='sb_publishable_Ds1oRszcoozkgZju6o1L9w_HP60YnpO';
-const $=id=>document.getElementById(id);const EVENT_START='2026-10-09',EVENT_WEEKS=10,EVENT_END='2026-12-17';let db=null,user=null,guestMode=false,authPanelOpen=false,wallets=[],claims=[],selected=null,showAll=false,historyPeriod="current",platformSelected='MPay',showAddWalletPanel=false;let recordCollapsed=null,calcResult=null,calcInventorySignature=null;
+const $=id=>document.getElementById(id);const EVENT_START='2026-10-09',EVENT_WEEKS=10,EVENT_END='2026-12-17';let db=null,user=null,guestMode=false,authPanelOpen=false,wallets=[],claims=[],selected=null,showAll=false,historyPeriod="current",platformSelected='MPay',showAddWalletPanel=false;let recordCollapsed=null,calcResult=null,calcInventorySignature=null,calcResultRedeemed=false;
 const LOCAL_KEY='macauRewards2026_local_v1';
 function readLocal(){try{const x=JSON.parse(localStorage.getItem(LOCAL_KEY)||'{}');return {wallets:Array.isArray(x.wallets)?x.wallets:[],claims:Array.isArray(x.claims)?x.claims:[]}}catch(e){return {wallets:[],claims:[]}}}
 function writeLocal(){try{localStorage.setItem(LOCAL_KEY,JSON.stringify({wallets,claims}))}catch(e){throw Error('本機儲存失敗，請檢查手機儲存空間或瀏覽器設定。')}}
@@ -188,10 +188,11 @@ function renderCalculatorControls(){
  $('calcMaxWallets').value=previousLimit==='all'?'all':String(Math.min(Number(previousLimit)||max,max));
  $('calcInventoryHint').textContent='可用 '+active.length+' 個錢包 · '+available.length+' 張有效未核銷面額券 · 券值合計 '+money(available.reduce((s,c)=>s+Number(c.coupon_value||0),0));
  $('calcWalletOverview').innerHTML=active.length?active.map(w=>{const own=available.filter(c=>c.wallet_id===w.id),owner=w.owner_name&&w.owner_name!=='自己'?' · '+esc(w.owner_name):'';return '<div class="calc-wallet-card"><div class="calc-wallet-title">'+esc(w.name)+owner+'</div><div class="calc-wallet-chips">'+(own.length?own.map(c=>'<span class="calc-chip '+(Number(c.coupon_value)>=50?'gold':'blue')+'">MOP '+Number(c.coupon_value)+'</span>').join(''):'<span class="calc-wallet-empty">沒有可用券</span>')+'</div><div class="calc-wallet-total">'+own.length+' 張可用 · '+money(own.reduce((s,c)=>s+Number(c.coupon_value||0),0))+'</div></div>'}).join(''):'<div class="calc-wallet-empty">目前沒有可用錢包</div>';
- if(calcInventorySignature!==null&&calcInventorySignature!==signature){calcResult=null;$('calcSummary').textContent='優惠券或錢包資料已有變動，請重新計算。';$('calcDetails').innerHTML='';$('calcAction').classList.add('hidden')}
+ if(calcInventorySignature!==null&&calcInventorySignature!==signature&&!calcResultRedeemed){calcResult=null;$('calcSummary').textContent='優惠券或錢包資料已有變動，請重新計算。';$('calcDetails').innerHTML='';$('calcAction').classList.add('hidden')}
  calcInventorySignature=signature;
 }
 function runIntegratedCalculator(){
+ calcResultRedeemed=false; $('calcRedeem').disabled=false; $('calcRedeem').textContent='核銷這些優惠券';
  const spend=Number($('calcSpend').value)||0;
  const {active,available,signature}=getCalculatorInventory();
  const coupons=available.map(c=>({id:c.id,wallet:c.wallet_id,value:Number(c.coupon_value),walletName:wallets.find(w=>w.id===c.wallet_id)?.name||'錢包'}));
@@ -199,7 +200,7 @@ function runIntegratedCalculator(){
   const result=window.RewardsCalculator.calculate({spend,maxWallets:$('calcMaxWallets').value==='all'?active.length:Number($('calcMaxWallets').value),wallets:active,coupons});calcResult=result;calcInventorySignature=signature;
   if(!result.chosen.length){$('calcSummary').innerHTML='<div class="calc-empty-result">目前消費額及錢包付款上限下，沒有可核銷的優惠券。<br><span>可以增加消費金額，或檢查錢包是否有有效優惠券。</span></div>';$('calcDetails').innerHTML='';$('calcAction').classList.add('hidden');return}
   $('calcSummary').innerHTML='<div class="calc-result-heading"><div><span>最佳核銷方案</span><strong>可節省 '+money(result.sum)+'</strong></div><span class="calc-result-pill">'+result.chosen.length+' 張優惠券</span></div><div class="calc-stats"><div class="calc-stat primary"><span>能核銷券值</span><strong>'+money(result.sum)+'</strong></div><div class="calc-stat"><span>完成／使用錢包</span><strong>'+result.selected.completedWallets+' 個／'+result.allocations.length+' 個</strong></div><div class="calc-stat"><span>核銷所需最低消費額</span><strong>'+money(result.minTotal)+'</strong></div><div class="calc-stat"><span>未能涵蓋消費額</span><strong>'+money(result.uncovered)+'</strong></div></div>';
-  $('calcDetails').innerHTML='<div class="calc-recommendation"><h3>建議付款分配</h3><p>消費總額 '+money(spend)+' · 優惠券抵扣 '+money(result.sum)+' · 消費者實際支出 '+money(result.actualSpend)+'</p>'+result.allocations.map((p,i)=>{const values=p.coupons.map(c=>money(c.value)).join('、'),couponSum=p.coupons.reduce((s,c)=>s+Number(c.value),0),walletCoupons=available.filter(c=>c.wallet_id===p.wallet),unused=walletCoupons.filter(c=>!p.coupons.some(x=>x.id===c.id)).length;return '<div class="calc-payment"><div class="calc-payment-head"><div><strong>'+esc(p.walletName)+'</strong><span class="calc-payment-order">第 '+(i+1)+' 個付款錢包</span></div><b>'+money(p.amount)+'</b></div><div class="calc-payment-meta">使用優惠券：'+values+'（共 '+money(couponSum)+'）<br>核銷最低消費額 '+money(p.minimum)+' · 付款後實際支出 '+money(p.amount-couponSum)+'<br><strong>'+(unused===0?'✓ 此錢包所有可用面額券已用完':'尚有 '+unused+' 張面額券未使用')+'</strong></div></div>'}).join('')+'<div class="calc-allocation-total">分配消費合計：<strong>'+money(result.allocations.reduce((s,p)=>s+p.amount,0))+'</strong></div></div>';
+  $('calcDetails').innerHTML='<div class="calc-recommendation"><h3>建議付款分配</h3><p>消費總額 '+money(spend)+' · 優惠券抵扣 '+money(result.sum)+' · 消費者實際支出 '+money(result.actualSpend)+'</p>'+result.allocations.map((p,i)=>{const values=p.coupons.map(c=>'<span data-calc-coupon-id="'+esc(c.id)+'">'+money(c.value)+(c.redeemed?'（已核銷）':'')+'</span>').join('、'),couponSum=p.coupons.reduce((s,c)=>s+Number(c.value),0),walletCoupons=available.filter(c=>c.wallet_id===p.wallet),unused=walletCoupons.filter(c=>!p.coupons.some(x=>x.id===c.id)).length;return '<div class="calc-payment"><div class="calc-payment-head"><div><strong>'+esc(p.walletName)+'</strong><span class="calc-payment-order">第 '+(i+1)+' 個付款錢包</span></div><b>'+money(p.amount)+'</b></div><div class="calc-payment-meta">使用優惠券：'+values+'（共 '+money(couponSum)+'）<br>核銷最低消費額 '+money(p.minimum)+' · 付款後實際支出 '+money(p.amount-couponSum)+'<br><strong>'+(unused===0?'✓ 此錢包所有可用面額券已用完':'尚有 '+unused+' 張面額券未使用')+'</strong></div></div>'}).join('')+'<div class="calc-allocation-total">分配消費合計：<strong>'+money(result.allocations.reduce((s,p)=>s+p.amount,0))+'</strong></div></div>';
   $('calcActionHint').textContent='將核銷 '+result.chosen.length+' 張優惠券；執行前會再次檢查券是否仍有效及未核銷。';$('calcAction').classList.remove('hidden');
  }catch(e){calcResult=null;$('calcSummary').textContent=e.message;$('calcDetails').innerHTML='';$('calcAction').classList.add('hidden')}
 }
@@ -219,7 +220,10 @@ async function redeemCalculatedCoupons(){
   if((r.data||[]).length!==ids.length)throw Error('雲端只更新了部分優惠券；請重新載入檢查記錄，暫不視為核銷成功。');
   const loaded=await load();if(!loaded)throw Error('核銷已送出，但重新載入雲端資料失敗；請重新整理確認狀態。');
  }
- calcResult=null;render();msg('已核銷 '+ids.length+' 張，合計 '+money(total)+'。');
+ calcResultRedeemed=true;
+ ids.forEach(id=>{const claim=claims.find(c=>String(c.id)===id);if(claim)claim.redeemed=true;const chip=[...$('calcDetails').querySelectorAll('[data-calc-coupon-id]')].find(el=>el.dataset.calcCouponId===id);if(chip&&!chip.textContent.includes('已核銷'))chip.textContent+='（已核銷）'});
+ $('calcRedeem').disabled=true;$('calcRedeem').textContent='✓ 已核銷完成';$('calcActionHint').textContent='本方案 '+ids.length+' 張優惠券已核銷；上方付款分配及券面額資料已保留供查閱。';
+ render();msg('已核銷 '+ids.length+' 張，合計 '+money(total)+'。');
 }
 function setWorkspace(mode){
  const calculator=mode==='calculator';$('recordWorkspace').classList.toggle('hidden',calculator);$('calculatorWorkspace').classList.toggle('hidden',!calculator);
